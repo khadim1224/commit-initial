@@ -28,7 +28,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001');
+    // Utilise une variable d'environnement pour l'URL du serveur Socket.io en production
+    const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+    const newSocket = io(socketUrl);
     
     newSocket.on('connect', () => {
       console.log('Connecté au serveur');
