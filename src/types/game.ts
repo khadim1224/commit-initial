@@ -2,7 +2,7 @@ export interface Player {
   id: string;
   name: string;
   score: number;
-  status: 'waiting' | 'selected' | 'blocked' | 'correct' | 'incorrect';
+  status: 'waiting' | 'selected' | 'blocked' | 'correct' | 'incorrect' | 'qualified' | 'eliminated' | 'winner';
 }
 
 export interface Question {
@@ -11,6 +11,8 @@ export interface Question {
   options: string[];
   correct: number;
 }
+
+export type TournamentStage = 'premiere' | 'huitiemes' | 'demi' | 'finale';
 
 export interface Room {
   code: string;
@@ -28,9 +30,10 @@ export interface Room {
   };
   scores: Record<string, number>;
   questions: Question[];
+  stage?: TournamentStage; // nouvelle propriété: manche de la compétition
 }
 
-export type UserRole = 'host' | 'player';
+export type UserRole = 'host' | 'player' | 'monitor';
 
 export interface GameState {
   role: UserRole;
@@ -40,6 +43,7 @@ export interface GameState {
   currentQuestion: Question | null;
   showQuestion: boolean;
   gameStatus: string;
+  activeRoomExists?: boolean; // indique si une salle active existe globalement
   timers: {
     buzzer: number;
     answer: number;

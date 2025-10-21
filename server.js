@@ -18,127 +18,38 @@ app.use(express.json());
 
 // Questions sur l'histoire du Sénégal
 const questions = [
-  {
-    id: 1,
-    question: "En quelle année le Sénégal a-t-il obtenu son indépendance ?",
-    options: ["1958", "1960", "1962", "1965"],
-    correct: 1
-  },
-  {
-    id: 2,
-    question: "Qui était le premier président du Sénégal indépendant ?",
-    options: ["Mamadou Dia", "Léopold Sédar Senghor", "Abdou Diouf", "Abdoulaye Wade"],
-    correct: 1
-  },
-  {
-    id: 3,
-    question: "Quelle est l'ancienne capitale du Sénégal colonial français ?",
-    options: ["Dakar", "Saint-Louis", "Thiès", "Kaolack"],
-    correct: 1
-  },
-  {
-    id: 4,
-    question: "Le royaume du Cayor était dirigé par des :",
-    options: ["Rois", "Damel", "Buur", "Lamane"],
-    correct: 1
-  },
-  {
-    id: 5,
-    question: "Qui était Lat Dior ?",
-    options: ["Un explorateur", "Un damel du Cayor", "Un marabout", "Un colonisateur"],
-    correct: 1
-  },
-  {
-    id: 6,
-    question: "L'île de Gorée était principalement connue pour :",
-    options: ["Le commerce d'or", "La traite négrière", "La pêche", "L'agriculture"],
-    correct: 1
-  },
-  {
-    id: 7,
-    question: "Quel fleuve traverse le Sénégal ?",
-    options: ["Niger", "Gambie", "Sénégal", "Casamance"],
-    correct: 2
-  },
-  {
-    id: 8,
-    question: "La bataille de Guilé a opposé Lat Dior aux :",
-    options: ["Portugais", "Anglais", "Français", "Hollandais"],
-    correct: 2
-  },
-  {
-    id: 9,
-    question: "Quel était le nom du parti de Léopold Sédar Senghor ?",
-    options: ["UPS", "BDS", "PAI", "RND"],
-    correct: 0
-  },
-  {
-    id: 10,
-    question: "La ville de Kaolack était célèbre pour le commerce de :",
-    options: ["L'or", "L'arachide", "Le mil", "Le coton"],
-    correct: 1
-  },
-  {
-    id: 11,
-    question: "Qui a succédé à Léopold Sédar Senghor à la présidence ?",
-    options: ["Mamadou Dia", "Abdou Diouf", "Abdoulaye Wade", "Macky Sall"],
-    correct: 1
-  },
-  {
-    id: 12,
-    question: "L'ethnie majoritaire au Sénégal est :",
-    options: ["Peul", "Wolof", "Serer", "Diola"],
-    correct: 1
-  },
-  {
-    id: 13,
-    question: "Le marabout Ahmadou Bamba a fondé la confrérie des :",
-    options: ["Tidjanes", "Mourides", "Layènes", "Qadiriyya"],
-    correct: 1
-  },
-  {
-    id: 14,
-    question: "La ville sainte de Touba a été fondée par :",
-    options: ["El Hadji Omar Tall", "Ahmadou Bamba", "Malik Sy", "Abdoulaye Yakhine"],
-    correct: 1
-  },
-  {
-    id: 15,
-    question: "Le Sénégal faisait partie de quelle fédération en Afrique de l'Ouest ?",
-    options: ["AOF", "AEF", "Union du Mali", "CEDEAO"],
-    correct: 0
-  },
-  {
-    id: 16,
-    question: "La résistance d'El Hadji Omar Tall s'est déroulée au :",
-    options: ["XVIIe siècle", "XVIIIe siècle", "XIXe siècle", "XXe siècle"],
-    correct: 2
-  },
-  {
-    id: 17,
-    question: "Quel port était le point de départ du chemin de fer Dakar-Niger ?",
-    options: ["Saint-Louis", "Dakar", "Rufisque", "Kaolack"],
-    correct: 1
-  },
-  {
-    id: 18,
-    question: "La région de la Casamance est habitée principalement par les :",
-    options: ["Wolof", "Serer", "Diola", "Peul"],
-    correct: 2
-  },
-  {
-    id: 19,
-    question: "En quelle année Dakar est-elle devenue capitale du Sénégal ?",
-    options: ["1902", "1958", "1960", "1904"],
-    correct: 1
-  },
-  {
-    id: 20,
-    question: "Le mouvement de la Négritude a été cofondé par :",
-    options: ["Cheikh Anta Diop", "Léopold Sédar Senghor", "Alioune Diop", "Abdoulaye Sadji"],
-    correct: 1
-  }
+  { id: 1, question: "En quelle année le Sénégal a-t-il obtenu son indépendance ?", options: ["1958", "1960", "1962", "1965"], correct: 1 },
+  { id: 2, question: "Qui était le premier président du Sénégal indépendant ?", options: ["Mamadou Dia", "Léopold Sédar Senghor", "Abdou Diouf", "Abdoulaye Wade"], correct: 1 },
+  { id: 3, question: "Quelle est l'ancienne capitale du Sénégal colonial français ?", options: ["Dakar", "Saint-Louis", "Thiès", "Kaolack"], correct: 1 },
+  { id: 4, question: "Le royaume du Cayor était dirigé par des :", options: ["Rois", "Damel", "Buur", "Lamane"], correct: 1 },
+  { id: 5, question: "Qui était Lat Dior ?", options: ["Un explorateur", "Un damel du Cayor", "Un marabout", "Un colonisateur"], correct: 1 },
+  { id: 6, question: "L'île de Gorée était principalement connue pour :", options: ["Le commerce d'or", "La traite négrière", "La pêche", "L'agriculture"], correct: 1 },
+  { id: 7, question: "Quel fleuve traverse le Sénégal ?", options: ["Niger", "Gambie", "Sénégal", "Casamance"], correct: 2 },
+  { id: 8, question: "La bataille de Guilé a opposé Lat Dior aux :", options: ["Portugais", "Anglais", "Français", "Hollandais"], correct: 2 },
+  { id: 9, question: "Quel était le nom du parti de Léopold Sédar Senghor ?", options: ["UPS", "BDS", "PAI", "RND"], correct: 0 },
+  { id: 10, question: "La ville de Kaolack était célèbre pour le commerce de :", options: ["L'or", "L'arachide", "Le mil", "Le coton"], correct: 1 },
+  { id: 11, question: "Qui a succédé à Léopold Sédar Senghor à la présidence ?", options: ["Mamadou Dia", "Abdou Diouf", "Abdoulaye Wade", "Macky Sall"], correct: 1 },
+  { id: 12, question: "L'ethnie majoritaire au Sénégal est :", options: ["Peul", "Wolof", "Serer", "Diola"], correct: 1 },
+  { id: 13, question: "Le marabout Ahmadou Bamba a fondé la confrérie des :", options: ["Tidjanes", "Mourides", "Layènes", "Qadiriyya"], correct: 1 },
+  { id: 14, question: "La ville sainte de Touba a été fondée par :", options: ["El Hadji Omar Tall", "Ahmadou Bamba", "Malik Sy", "Abdoulaye Yakhine"], correct: 1 },
+  { id: 15, question: "Le Sénégal faisait partie de quelle fédération en Afrique de l'Ouest ?", options: ["AOF", "AEF", "Union du Mali", "CEDEAO"], correct: 0 },
+  { id: 16, question: "La résistance d'El Hadji Omar Tall s'est déroulée au :", options: ["XVIIe siècle", "XVIIIe siècle", "XIXe siècle", "XXe siècle"], correct: 2 },
+  { id: 17, question: "Quel port était le point de départ du chemin de fer Dakar-Niger ?", options: ["Saint-Louis", "Dakar", "Rufisque", "Kaolack"], correct: 1 },
+  { id: 18, question: "La région de la Casamance est habitée principalement par les :", options: ["Wolof", "Serer", "Diola", "Peul"], correct: 2 },
+  { id: 19, question: "En quelle année Dakar est-elle devenue capitale du Sénégal ?", options: ["1902", "1958", "1960", "1904"], correct: 1 },
+  { id: 20, question: "Le mouvement de la Négritude a été cofondé par :", options: ["Cheikh Anta Diop", "Léopold Sédar Senghor", "Alioune Diop", "Abdoulaye Sadji"], correct: 1 }
 ];
+
+// Construire des sets de questions par manche (disjoints)
+function buildStageSets() {
+  const shuffled = [...questions].sort(() => Math.random() - 0.5);
+  return {
+    premiere: shuffled.slice(0, 5),
+    huitiemes: shuffled.slice(5, 10),
+    demi: shuffled.slice(10, 15),
+    finale: shuffled.slice(15, 20)
+  };
+}
 
 // État global des salles
 const rooms = new Map();
@@ -152,9 +63,20 @@ function generateRoomCode() {
 io.on('connection', (socket) => {
   console.log('Utilisateur connecté:', socket.id);
 
+  // Informer immédiatement le client de l'état des salles actives
+  socket.emit('active-room-status', { exists: rooms.size > 0 });
+
   // Créer une nouvelle salle
   socket.on('create-room', (hostName) => {
+    // Empêcher la création d'une nouvelle salle si une existe déjà
+    if (rooms.size > 0) {
+      socket.emit('error', { message: 'Une salle existe déjà. Rejoignez-la ou regardez le jeu.' });
+      socket.emit('active-room-status', { exists: true });
+      return;
+    }
+
     const roomCode = generateRoomCode();
+    const stageSets = buildStageSets();
     const room = {
       code: roomCode,
       host: {
@@ -170,7 +92,9 @@ io.on('connection', (socket) => {
         timestamp: null
       },
       scores: {},
-      questions: [...questions].sort(() => Math.random() - 0.5), // Mélanger les questions
+      questions: [], // pas de questions tant que la manche n'est pas sélectionnée
+      stageSets, // conserver les sets pour basculer de manche
+      stage: null, // l'hôte doit sélectionner la manche explicitement
       timers: {
         buzzer: null,
         answer: null
@@ -181,6 +105,8 @@ io.on('connection', (socket) => {
     socket.join(roomCode);
     
     socket.emit('room-created', { roomCode, room });
+    // Notifier tous les clients qu'une salle est désormais active
+    io.emit('active-room-status', { exists: true, roomCode });
     console.log(`Salle créée: ${roomCode} par ${hostName}`);
   });
 
@@ -220,10 +146,69 @@ io.on('connection', (socket) => {
     console.log(`${playerName} a rejoint la salle ${roomCode}`);
   });
 
+  // Ajout: configuration du nombre de qualifiés par manche
+const STAGE_QUALIFIERS = {
+  premiere: 10,
+  huitiemes: 4,
+  demi: 2,
+  finale: 1,
+};
+
+  // Définir la manche (par l'hôte)
+  socket.on('set-stage', (data) => {
+    const { roomCode, stage } = data; // stage: 'premiere' | 'huitiemes' | 'demi' | 'finale'
+    const room = rooms.get(roomCode);
+    if (!room || room.host.id !== socket.id) return;
+
+    // Verrouillage: impossible de changer de manche pendant le jeu
+    if (room.gameState !== 'waiting' && room.gameState !== 'finished') {
+      socket.emit('error', { message: 'Impossible de changer de manche pendant la partie.' });
+      return;
+    }
+
+    if (!room.stageSets || !room.stageSets[stage]) {
+      // reconstruire si nécessaire
+      room.stageSets = buildStageSets();
+    }
+
+    // Reset des compteurs/timers
+    if (room.timers.buzzer) clearInterval(room.timers.buzzer);
+    if (room.timers.answer) clearInterval(room.timers.answer);
+
+    room.stage = stage;
+    room.questions = room.stageSets[stage];
+    room.currentQuestion = 0;
+    room.gameState = 'waiting';
+    room.buzzer = { active: false, playerId: null, timestamp: null };
+
+    // Réinitialiser les statuts/scores des joueurs non éliminés
+    room.players.forEach(p => {
+      if (p.status !== 'eliminated') {
+        p.status = 'waiting';
+        p.score = 0;
+        room.scores[p.id] = 0;
+      }
+    });
+
+    io.to(roomCode).emit('stage-updated', {
+      stage: room.stage,
+      totalQuestions: room.questions.length,
+      room
+    });
+
+    console.log(`Manche définie sur ${stage} dans la salle ${roomCode}`);
+  });
+
   // Commencer la partie
   socket.on('start-game', (roomCode) => {
     const room = rooms.get(roomCode);
     if (!room || room.host.id !== socket.id) return;
+
+    // Exiger la sélection de la manche avant démarrage
+    if (!room.stage || !room.questions || room.questions.length === 0) {
+      socket.emit('error', { message: 'Sélectionnez une manche avant de commencer le jeu.' });
+      return;
+    }
 
     room.gameState = 'question_active';
     room.currentQuestion = 0;
@@ -241,6 +226,11 @@ io.on('connection', (socket) => {
   socket.on('show-question-to-all', (roomCode) => {
     const room = rooms.get(roomCode);
     if (!room || room.host.id !== socket.id) return;
+
+    if (!room.stage) {
+      socket.emit('error', { message: 'Aucune manche sélectionnée.' });
+      return;
+    }
 
     room.gameState = 'question_displayed';
     const currentQ = room.questions[room.currentQuestion];
@@ -266,6 +256,30 @@ io.on('connection', (socket) => {
     });
 
     console.log(`Question ${room.currentQuestion + 1} masquée dans la salle ${roomCode}`);
+  });
+
+  // Regarder une salle (spectateur/moniteur)
+  socket.on('watch-room', (data) => {
+    const { roomCode } = data;
+    const room = rooms.get(roomCode);
+
+    if (!room) {
+      socket.emit('error', { message: 'Salle introuvable' });
+      return;
+    }
+
+    // Un spectateur peut rejoindre à tout moment, sans être ajouté aux joueurs
+    socket.join(roomCode);
+
+    const currentQ = (room.gameState === 'question_displayed') ? room.questions[room.currentQuestion] : null;
+
+    socket.emit('room-watched', { 
+      roomCode, 
+      room, 
+      question: currentQ
+    });
+
+    console.log(`Spectateur ${socket.id} regarde la salle ${roomCode}`);
   });
 
   // Activer une question
@@ -294,7 +308,7 @@ io.on('connection', (socket) => {
     console.log(`Question ${room.currentQuestion + 1} activée dans la salle ${roomCode}`);
 
     // Démarrer le compte à rebours du buzzer
-    let buzzerCountdown = 3;
+    let buzzerCountdown = 10;
     io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
 
     room.timers.buzzer = setInterval(() => {
@@ -331,6 +345,9 @@ io.on('connection', (socket) => {
     const player = room.players.find(p => p.id === socket.id);
     if (!player) return;
 
+    // Bloquer les joueurs éliminés
+    if (player.status === 'eliminated') return;
+
     // Premier joueur à presser le buzzer
     room.buzzer.playerId = socket.id;
     room.buzzer.timestamp = Date.now();
@@ -364,7 +381,7 @@ io.on('connection', (socket) => {
     console.log(`${player.name} a pressé le buzzer dans la salle ${roomCode}`);
 
     // Démarrer le compte à rebours pour la réponse
-    let answerCountdown = 7;
+    let answerCountdown = 15;
     io.to(roomCode).emit('timer-update', { type: 'answer', countdown: answerCountdown });
 
     room.timers.answer = setInterval(() => {
@@ -374,9 +391,7 @@ io.on('connection', (socket) => {
       if (answerCountdown === 0) {
         clearInterval(room.timers.answer);
         if (room.gameState === 'answering') {
-          // Temps écoulé, considérer comme une mauvaise réponse
-          room.scores[socket.id] = Math.max(0, room.scores[socket.id] - 5);
-          player.score = Math.max(0, player.score - 5);
+          // Temps écoulé, considérer comme une mauvaise réponse (sans pénalité)
           player.status = 'incorrect';
           room.gameState = 'results';
 
@@ -399,7 +414,7 @@ io.on('connection', (socket) => {
   socket.on('submit-answer', (data) => {
     const { roomCode, answer } = data;
     const room = rooms.get(roomCode);
-    
+
     if (!room || room.gameState !== 'answering' || room.buzzer.playerId !== socket.id) return;
 
     // Arrêter le compte à rebours de la réponse
@@ -414,8 +429,7 @@ io.on('connection', (socket) => {
       player.score += 10;
       player.status = 'correct';
     } else {
-      room.scores[socket.id] = Math.max(0, room.scores[socket.id] - 5);
-      player.score = Math.max(0, player.score - 5);
+      // Mauvaise réponse sans pénalité
       player.status = 'incorrect';
     }
 
@@ -446,10 +460,10 @@ io.on('connection', (socket) => {
     room.currentQuestion++;
     
     if (room.currentQuestion >= room.questions.length) {
-      // Fin de partie
+      // Fin de manche
       room.gameState = 'finished';
       
-      // Calculer le classement final
+      // Calculer le classement
       const finalRanking = room.players
         .map(player => ({
           ...player,
@@ -457,10 +471,37 @@ io.on('connection', (socket) => {
         }))
         .sort((a, b) => b.score - a.score);
 
-      io.to(roomCode).emit('game-finished', {
-        finalRanking,
-        scores: room.scores
+      const qualifiersCount = STAGE_QUALIFIERS[room.stage] || 0;
+      const qualified = finalRanking.slice(0, qualifiersCount).map(p => p.id);
+      const eliminated = finalRanking.slice(qualifiersCount).map(p => p.id);
+
+      // Mettre à jour les statuts
+      room.players.forEach(p => {
+        if (qualified.includes(p.id)) {
+          p.status = room.stage === 'finale' ? 'winner' : 'qualified';
+        } else {
+          p.status = 'eliminated';
+        }
       });
+
+      // Émettre un événement de fin de manche avec qualifiés/éliminés
+      io.to(roomCode).emit('stage-finished', {
+        finalRanking,
+        scores: room.scores,
+        stage: room.stage,
+        qualifiersCount,
+        qualified,
+        eliminated,
+      });
+
+      // En finale, émettre aussi l'événement de fin de jeu
+      if (room.stage === 'finale') {
+        io.to(roomCode).emit('game-finished', {
+          finalRanking,
+          scores: room.scores,
+          stage: room.stage
+        });
+      }
     } else {
       room.gameState = 'question_active';
       room.buzzer = {
@@ -469,9 +510,9 @@ io.on('connection', (socket) => {
         timestamp: null
       };
 
-      // Réinitialiser les statuts des joueurs
+      // Réinitialiser les statuts des joueurs (non éliminés)
       room.players.forEach(player => {
-        player.status = 'waiting';
+        player.status = player.status === 'eliminated' ? 'eliminated' : 'waiting';
       });
 
       io.to(roomCode).emit('next-question', {
@@ -493,6 +534,8 @@ io.on('connection', (socket) => {
         // L'hôte s'est déconnecté, supprimer la salle
         io.to(roomCode).emit('host-disconnected');
         rooms.delete(roomCode);
+        // Émettre l'état global mis à jour (peut redevenir aucune salle active)
+        io.emit('active-room-status', { exists: rooms.size > 0 });
         console.log(`Salle ${roomCode} supprimée (hôte déconnecté)`);
       } else {
         // Un joueur s'est déconnecté

@@ -6,6 +6,7 @@ import { HostInterface } from './components/HostInterface';
 import { PlayerInterface } from './components/PlayerInterface';
 import { ErrorMessage } from './components/ErrorMessage';
 import { LandingPage } from './components/LandingPage';
+import { MonitorInterface } from './components/MonitorInterface';
 
 const GameApp: React.FC = () => {
   const {
@@ -14,6 +15,7 @@ const GameApp: React.FC = () => {
     loading,
     createRoom,
     joinRoom,
+    watchRoom,
     startGame,
     activateQuestion,
     pressBuzzer,
@@ -22,7 +24,9 @@ const GameApp: React.FC = () => {
     resetGame,
     clearError,
     showQuestionToAll,
-    hideQuestionFromAll
+    hideQuestionFromAll,
+    showQuestionAndActivateBuzzer,
+    setTournamentStage,
   } = useGame();
 
   const [showLanding, setShowLanding] = React.useState(true);
@@ -39,7 +43,9 @@ const GameApp: React.FC = () => {
         <HomePage
           onCreateRoom={createRoom}
           onJoinRoom={joinRoom}
+          onWatchRoom={watchRoom}
           loading={loading}
+          canCreateRoom={!gameState.activeRoomExists}
         />
       )}
 
@@ -52,6 +58,8 @@ const GameApp: React.FC = () => {
           onResetGame={resetGame}
           onShowQuestionToAll={showQuestionToAll}
           onHideQuestionFromAll={hideQuestionFromAll}
+          onShowQuestionAndActivateBuzzer={showQuestionAndActivateBuzzer}
+          onSetStage={setTournamentStage}
         />
       )}
 
@@ -61,6 +69,12 @@ const GameApp: React.FC = () => {
           onPressBuzzer={pressBuzzer}
           onSubmitAnswer={submitAnswer}
           onResetGame={resetGame}
+        />
+      )}
+
+      {gameState.role === 'monitor' && (gameState.gameStatus === 'lobby' || gameState.gameStatus === 'playing' || gameState.gameStatus === 'finished') && (
+        <MonitorInterface
+          gameState={gameState}
         />
       )}
     </>

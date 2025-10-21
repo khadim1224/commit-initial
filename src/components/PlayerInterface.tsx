@@ -171,8 +171,7 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
             )}
 
             {/* Bouton Buzzer */}
-            {!showQuestion && (
-              <div className="text-center">
+            <div className="text-center">
                 {room.gameState === 'buzzer_active' && currentPlayer?.status === 'waiting' && (
                   <div>
                     <audio ref={buzzerAudioRef} src="/sounds/buzzer.mp3" preload="auto"></audio>
@@ -236,7 +235,7 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                     {currentPlayer?.status === 'incorrect' && (
                       <>
                         <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                        <p className="text-red-600 text-lg font-semibold">Mauvaise réponse... -5 points</p>
+                        <p className="text-red-600 text-lg font-semibold">Mauvaise réponse... 0 point</p>
                       </>
                     )}
                     {currentPlayer?.status === 'waiting' && (
@@ -248,7 +247,6 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                   </div>
                 )}
               </div>
-            )}
           </div>
 
           {/* Mini classement */}

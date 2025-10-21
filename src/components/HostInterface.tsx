@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Crown, Users, Play, SkipForward, Trophy, AlertCircle } from 'lucide-react';
-import { GameState } from '../types/game';
+import { GameState, TournamentStage } from '../types/game';
 
 interface HostInterfaceProps {
   gameState: GameState;
@@ -10,6 +10,8 @@ interface HostInterfaceProps {
   onResetGame: () => void;
   onShowQuestionToAll: () => void;
   onHideQuestionFromAll: () => void;
+  onShowQuestionAndActivateBuzzer?: () => void;
+  onSetStage?: (stage: TournamentStage) => void;
 }
 
 export const HostInterface: React.FC<HostInterfaceProps> = ({
@@ -20,6 +22,8 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
   onResetGame,
   onShowQuestionToAll,
   onHideQuestionFromAll,
+  onShowQuestionAndActivateBuzzer,
+  onSetStage,
 }) => {
   const { room, gameStatus, timers } = gameState;
   const correctAudioRef = useRef<HTMLAudioElement>(null);
@@ -51,6 +55,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
 
   // Lobby - En attente de joueurs
   if (gameStatus === 'lobby') {
+    const stageSelected = !!room.stage;
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 p-4">
         <div className="max-w-4xl mx-auto">
@@ -62,6 +67,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Salle d'Attente</h1>
                   <p className="text-gray-600">Animé par {room.host.name}</p>
+                  <p className="text-sm text-gray-500 mt-1">Manche: <span className="font-semibold capitalize">{room.stage ? room.stage : 'Aucune (sélection requise)'}</span></p>
                 </div>
               </div>
               <div className="text-center">
@@ -71,6 +77,21 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 <p className="text-sm text-gray-500 mt-1">Code de la salle</p>
               </div>
             </div>
+          </div>
+
+          {/* Sélection de la manche */}
+          <div className="bg-white rounded-2xl shadow-2xl p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Définir la manche</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <button className="px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold" onClick={() => onSetStage && onSetStage('premiere')}>Première manche</button>
+              <button className="px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold" onClick={() => onSetStage && onSetStage('huitiemes')}>Huitièmes</button>
+              <button className="px-4 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold" onClick={() => onSetStage && onSetStage('demi')}>Demi-finale</button>
+              <button className="px-4 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-semibold" onClick={() => onSetStage && onSetStage('finale')}>Finale</button>
+            </div>
+            {!stageSelected && (
+              <p className="text-sm text-red-600 mt-3">Veuillez sélectionner une manche avant de commencer la partie.</p>
+            )}
+            <p className="text-sm text-gray-500 mt-1">Chaque manche utilise son propre set de questions.</p>
           </div>
 
           {/* Joueurs connectés */}
@@ -110,25 +131,16 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={onStartGame}
-                disabled={room.players.length === 0}
+                disabled={!stageSelected || room.players.length === 0}
                 className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
               >
                 <Play className="w-5 h-5" />
                 <span>Commencer la Partie</span>
               </button>
-              
-              <button
-                onClick={onResetGame}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors"
-              >
-                Retour à l'Accueil
-              </button>
+              <button onClick={onResetGame} className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors">Retour à l'Accueil</button>
             </div>
-            
             {room.players.length === 0 && (
-              <p className="text-center text-sm text-gray-500 mt-3">
-                Au moins 1 joueur doit être connecté pour commencer
-              </p>
+              <p className="text-center text-sm text-gray-500 mt-3">Au moins 1 joueur doit être connecté pour commencer</p>
             )}
           </div>
         </div>
@@ -139,7 +151,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
   // Interface de jeu
   if (gameStatus === 'playing') {
     const currentQuestionNumber = room.currentQuestion + 1;
-    const totalQuestions = 20;
+    const totalQuestions = room.questions.length;
     const progress = (currentQuestionNumber / totalQuestions) * 100;
 
     return (
@@ -185,13 +197,36 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 Contrôles de Jeu
               </h2>
 
-              {(room.gameState === 'question_displayed' || room.gameState === 'results') && room.currentQuestion !== undefined && (
+              {(room.gameState === 'question_displayed' || room.gameState === 'buzzer_active' || room.gameState === 'answering' || room.gameState === 'results') && room.currentQuestion !== undefined && (
                 <div className="bg-gray-100 p-4 rounded-lg mb-4">
                   <p className="text-lg font-semibold">Question :</p>
                   <p>{room.questions[room.currentQuestion].question}</p>
+                  
+                  {/* Affichage des réponses colorées pour l'hôte */}
+                  <div className="mt-4 pt-4 border-t">
+                    <p className="text-lg font-semibold mb-3">Réponses :</p>
+                    <div className="space-y-2">
+                      {room.questions[room.currentQuestion].options.map((option, index) => (
+                        <div 
+                          key={index}
+                          className={`p-3 rounded-lg font-medium ${
+                            index === room.questions[room.currentQuestion].correct 
+                              ? 'bg-green-100 text-green-800 border-2 border-green-300' 
+                              : 'bg-red-100 text-red-800 border-2 border-red-300'
+                          }`}
+                        >
+                          <span className="font-bold">{String.fromCharCode(65 + index)}.</span> {option}
+                          {index === room.questions[room.currentQuestion].correct && (
+                            <span className="ml-2 text-green-600 font-bold">✓ Correcte</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
                   {room.gameState === 'results' && (
                     <div className="mt-2 pt-2 border-t">
-                      <p className="text-lg font-semibold">Réponse :</p>
+                      <p className="text-lg font-semibold">Réponse donnée :</p>
                       <p>{room.questions[room.currentQuestion].options[room.questions[room.currentQuestion].correct]}</p>
                     </div>
                   )}
@@ -201,22 +236,15 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
               <div className="space-y-4">
                 {(room.gameState === 'waiting' || room.gameState === 'question_active') && (
                   <button
-                    onClick={onShowQuestionToAll}
-                    className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
+                    onClick={onShowQuestionAndActivateBuzzer ?? onShowQuestionToAll}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
                   >
-                    <span>Afficher la question</span>
+                    <span>Afficher la question et activer le buzzer</span>
                   </button>
                 )}
 
                 {room.gameState === 'question_displayed' && (
                   <>
-                    <button
-                      onClick={onActivateQuestion}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
-                    >
-                      <Play className="w-5 h-5" />
-                      <span>Activer le Buzzer</span>
-                    </button>
                     <button
                       onClick={onHideQuestionFromAll}
                       className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-4 px-6 rounded-xl transition-colors flex items-center justify-center space-x-2"
@@ -243,6 +271,12 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                       <p className="font-semibold text-yellow-700">Buzzer Actif!</p>
                       <p className="text-sm text-yellow-600">En attente qu'un joueur appuie sur le buzzer</p>
                     </div>
+                    {room.players.find(p => p.status === 'selected') && (
+                      <div className="mt-3">
+                        <p className="text-sm text-yellow-700 font-semibold">Joueur ayant buzzé en premier</p>
+                        <p className="text-lg text-yellow-900 font-bold">{room.players.find(p => p.status === 'selected')?.name}</p>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -251,6 +285,12 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                     <AlertCircle className="w-8 h-8 text-blue-500 mx-auto mb-2" />
                     <p className="font-semibold text-blue-700">Réponse en cours</p>
                     <p className="text-sm text-blue-600">Un joueur répond à la question</p>
+                    {room.players.find(p => p.status === 'selected') && (
+                      <div className="mt-3">
+                        <p className="text-sm text-blue-700 font-semibold">Joueur ayant buzzé en premier</p>
+                        <p className="text-lg text-blue-900 font-bold">{room.players.find(p => p.status === 'selected')?.name}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -268,18 +308,22 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                   .sort((a, b) => (room.scores[b.id] || 0) - (room.scores[a.id] || 0))
                   .map((player, index) => {
                     const score = room.scores[player.id] || 0;
-                    const statusColors = {
+                    const statusColors: Record<string, string> = {
                       waiting: 'bg-gray-100 text-gray-600',
                       selected: 'bg-blue-100 text-blue-600 ring-2 ring-blue-300',
                       blocked: 'bg-red-100 text-red-600',
                       correct: 'bg-green-100 text-green-600',
-                      incorrect: 'bg-red-100 text-red-600'
+                      incorrect: 'bg-red-100 text-red-600',
+                      qualified: 'bg-green-50 text-green-700 ring-2 ring-green-300',
+                      eliminated: 'bg-gray-200 text-gray-500',
+                      winner: 'bg-yellow-100 text-yellow-700 ring-2 ring-yellow-300',
                     };
+                    const colorCls = statusColors[player.status] || 'bg-gray-100 text-gray-600';
                     
                     return (
                       <div 
                         key={player.id}
-                        className={`p-4 rounded-xl flex items-center justify-between transition-all ${statusColors[player.status]}`}
+                        className={`p-4 rounded-xl flex items-center justify-between transition-all ${colorCls}`}
                       >
                         <div className="flex items-center space-x-3">
                           <div className="text-lg font-bold">
@@ -293,6 +337,9 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                               {player.status === 'correct' && 'Réponse correcte'}
                               {player.status === 'incorrect' && 'Réponse incorrecte'}
                               {player.status === 'waiting' && 'En attente'}
+                              {player.status === 'qualified' && 'Qualifié'}
+                              {player.status === 'eliminated' && 'Éliminé'}
+                              {player.status === 'winner' && 'Vainqueur'}
                             </p>
                           </div>
                         </div>
@@ -328,7 +375,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-800 mb-6">🏆 Classement Final</h2>
               <div className="space-y-4">
-                {sortedPlayers.map((player, index) => (
+                {sortedPlayers.slice(0, 5).map((player, index) => (
                   <div 
                     key={player.id}
                     className={`p-6 rounded-xl flex items-center justify-between ${

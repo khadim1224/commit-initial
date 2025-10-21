@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from '../contexts/SocketContext';
-import { GameState, Player, Question, Room } from '../types/game';
+import { GameState, Player, Question, Room, TournamentStage } from '../types/game';
 
 export const useGame = () => {
   const { socket } = useSocket();
@@ -12,6 +12,7 @@ export const useGame = () => {
     currentQuestion: null,
     showQuestion: false,
     gameStatus: 'menu',
+    activeRoomExists: false,
     timers: {
       buzzer: 0,
       answer: 0,
@@ -25,10 +26,20 @@ export const useGame = () => {
   useEffect(() => {
     if (!socket) return;
 
+    // Etat global: une salle active existe-t-elle ?
+    socket.on('active-room-status', (data: { exists: boolean; roomCode?: string }) => {
+      setGameState(prev => ({
+        ...prev,
+        activeRoomExists: data.exists,
+      }));
+    });
+
     // Création de salle réussie
     socket.on('room-created', (data: { roomCode: string; room: Room }) => {
       setGameState(prev => ({
         ...prev,
+        role: 'host',
+        userName: prev.userName,
         roomCode: data.roomCode,
         room: data.room,
         gameStatus: 'lobby'
@@ -40,11 +51,38 @@ export const useGame = () => {
     socket.on('room-joined', (data: { roomCode: string; room: Room }) => {
       setGameState(prev => ({
         ...prev,
+        role: 'player',
         roomCode: data.roomCode,
         room: data.room,
         gameStatus: 'lobby'
       }));
       setLoading(false);
+    });
+
+    // Regarder une salle (spectateur)
+    socket.on('room-watched', (data: { roomCode: string; room: Room; question?: Question | null }) => {
+      const status = data.room.gameState === 'waiting' ? 'lobby' : (data.room.gameState === 'finished' ? 'finished' : 'playing');
+      setGameState(prev => ({
+        ...prev,
+        role: 'monitor',
+        roomCode: data.roomCode,
+        room: data.room,
+        gameStatus: status,
+        currentQuestion: data.question ?? null,
+        showQuestion: !!data.question
+      }));
+      setLoading(false);
+    });
+
+    // Nouveau: mise à jour de la manche
+    socket.on('stage-updated', (data: { stage: TournamentStage; totalQuestions: number; room: Room }) => {
+      setGameState(prev => ({
+        ...prev,
+        room: data.room,
+        gameStatus: 'lobby',
+        currentQuestion: null,
+        showQuestion: false,
+      }));
     });
 
     // Nouveau joueur rejoint
@@ -77,7 +115,8 @@ export const useGame = () => {
       setGameState(prev => ({
         ...prev,
         room: prev.room ? { ...prev.room, gameState: data.gameState as any, players: data.players, currentQuestion: data.currentQuestion } : null,
-        showQuestion: false
+        // Conserver l'affichage de la question pendant que le buzzer est actif
+        showQuestion: true
       }));
     });
 
@@ -108,6 +147,7 @@ export const useGame = () => {
           players: data.players,
           scores: data.scores 
         } : null,
+        currentQuestion: data.question ?? prev.currentQuestion,
         showQuestion: false
       }));
     });
@@ -128,11 +168,23 @@ export const useGame = () => {
     });
 
     // Partie terminée
-    socket.on('game-finished', (data: { finalRanking: Player[]; scores: Record<string, number> }) => {
+    socket.on('game-finished', (data: { finalRanking: Player[]; scores: Record<string, number>; stage?: TournamentStage }) => {
       setGameState(prev => ({
         ...prev,
         gameStatus: 'finished',
-        room: prev.room ? { ...prev.room, gameState: 'finished' as any, scores: data.scores } : null
+        room: prev.room ? { ...prev.room, gameState: 'finished' as any, scores: data.scores, /* stage reste dans room */ } : null
+      }));
+    });
+
+    // Nouveau: fin de manche avec qualifications/éliminations
+    socket.on('stage-finished', (data: { finalRanking: Player[]; scores: Record<string, number>; stage: TournamentStage; qualifiersCount: number; qualified: string[]; eliminated: string[] }) => {
+      setGameState(prev => ({
+        ...prev,
+        gameStatus: 'finished',
+        room: prev.room ? { ...prev.room, gameState: 'finished' as any, scores: data.scores, players: prev.room.players.map(p => ({
+          ...p,
+          status: data.qualified.includes(p.id) ? (data.stage === 'finale' ? 'winner' : 'qualified') : 'eliminated'
+        })) } : null,
       }));
     });
 
@@ -180,8 +232,11 @@ export const useGame = () => {
     });
 
     return () => {
+      socket.off('active-room-status');
       socket.off('room-created');
       socket.off('room-joined');
+      socket.off('room-watched');
+      socket.off('stage-updated');
       socket.off('player-joined');
       socket.off('player-left');
       socket.off('game-started');
@@ -214,6 +269,14 @@ export const useGame = () => {
     setError('');
     setGameState(prev => ({ ...prev, role: 'player', userName: playerName }));
     socket.emit('join-room', { roomCode: roomCode.toUpperCase(), playerName });
+  };
+
+  const watchRoom = (roomCode: string) => {
+    if (!socket) return;
+    setLoading(true);
+    setError('');
+    setGameState(prev => ({ ...prev, role: 'monitor', userName: '' }));
+    socket.emit('watch-room', { roomCode: roomCode.toUpperCase() });
   };
 
   const startGame = () => {
@@ -251,6 +314,19 @@ export const useGame = () => {
     socket.emit('hide-question-from-all', gameState.roomCode);
   };
 
+  // Afficher la question et activer le buzzer en une action
+  const showQuestionAndActivateBuzzer = () => {
+    if (!socket || !gameState.roomCode) return;
+    socket.emit('show-question-to-all', gameState.roomCode);
+    socket.emit('activate-question', gameState.roomCode);
+  };
+
+  // Définir la manche de tournoi
+  const setTournamentStage = (stage: TournamentStage) => {
+    if (!socket || !gameState.roomCode) return;
+    socket.emit('set-stage', { roomCode: gameState.roomCode, stage });
+  };
+
   const resetGame = () => {
     setGameState({
       role: 'player',
@@ -260,6 +336,7 @@ export const useGame = () => {
       currentQuestion: null,
       showQuestion: false,
       gameStatus: 'menu',
+      activeRoomExists: gameState.activeRoomExists ?? false,
       timers: {
         buzzer: 0,
         answer: 0,
@@ -277,6 +354,7 @@ export const useGame = () => {
     loading,
     createRoom,
     joinRoom,
+    watchRoom,
     startGame,
     activateQuestion,
     pressBuzzer,
@@ -285,6 +363,8 @@ export const useGame = () => {
     resetGame,
     clearError,
     showQuestionToAll,
-    hideQuestionFromAll
+    hideQuestionFromAll,
+    showQuestionAndActivateBuzzer,
+    setTournamentStage,
   };
 };
