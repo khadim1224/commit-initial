@@ -31,6 +31,17 @@ export interface Room {
   scores: Record<string, number>;
   questions: Question[];
   stage?: TournamentStage; // nouvelle propriété: manche de la compétition
+  // Valeur de la question en cours (+5/+10)
+  currentQuestionValue?: number;
+  // État du tie-break (candidats, places, compteur, question en cours)
+  tieBreak?: {
+    isActive: boolean;
+    candidates: string[];
+    slotsToFill: number;
+    askedCount: number;
+    maxQuestions: number;
+    question?: Question | null;
+  };
 }
 
 export type UserRole = 'host' | 'player' | 'monitor';

@@ -27,6 +27,7 @@ const GameApp: React.FC = () => {
     hideQuestionFromAll,
     showQuestionAndActivateBuzzer,
     setTournamentStage,
+    startTieBreak,
   } = useGame();
 
   const [showLanding, setShowLanding] = React.useState(true);
@@ -60,6 +61,7 @@ const GameApp: React.FC = () => {
           onHideQuestionFromAll={hideQuestionFromAll}
           onShowQuestionAndActivateBuzzer={showQuestionAndActivateBuzzer}
           onSetStage={setTournamentStage}
+          onStartTieBreak={startTieBreak}
         />
       )}
 

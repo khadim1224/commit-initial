@@ -98,7 +98,11 @@ io.on('connection', (socket) => {
       timers: {
         buzzer: null,
         answer: null
-      }
+      },
+      // Valeur de la question en cours (5 ou 10)
+      currentQuestionValue: 10,
+      // Historique des IDs de questions posées pour éviter les doublons
+      askedQuestionIds: new Set(),
     };
 
     rooms.set(roomCode, room);
@@ -154,6 +158,15 @@ const STAGE_QUALIFIERS = {
   finale: 1,
 };
 
+  // Calcul dynamique des qualifiés selon la manche et le nombre de joueurs
+  function getQualifiersCount(stage, playerCount) {
+    if (stage === 'finale') return 1;
+    if (stage === 'premiere') return Math.max(1, Math.floor(playerCount / 2));
+    if (stage === 'huitiemes') return Math.max(1, Math.floor((2 * playerCount) / 5));
+    if (stage === 'demi') return Math.max(1, Math.floor(playerCount / 2));
+    return Math.max(1, Math.floor(playerCount / 2));
+  }
+
   // Définir la manche (par l'hôte)
   socket.on('set-stage', (data) => {
     const { roomCode, stage } = data; // stage: 'premiere' | 'huitiemes' | 'demi' | 'finale'
@@ -180,6 +193,8 @@ const STAGE_QUALIFIERS = {
     room.currentQuestion = 0;
     room.gameState = 'waiting';
     room.buzzer = { active: false, playerId: null, timestamp: null };
+    room.currentQuestionValue = 10;
+    room.askedQuestionIds = new Set();
 
     // Réinitialiser les statuts/scores des joueurs non éliminés
     room.players.forEach(p => {
@@ -235,14 +250,19 @@ const STAGE_QUALIFIERS = {
     room.gameState = 'question_displayed';
     const currentQ = room.questions[room.currentQuestion];
 
+    // Tirage 50/50 de la valeur de la question (5 ou 10)
+    room.currentQuestionValue = Math.random() < 0.5 ? 5 : 10;
+    room.askedQuestionIds.add(currentQ.id);
+
     io.to(roomCode).emit('question-displayed', {
       question: currentQ,
       questionNumber: room.currentQuestion + 1,
       totalQuestions: room.questions.length,
       gameState: room.gameState,
+      questionValue: room.currentQuestionValue,
     });
 
-    console.log(`Question ${room.currentQuestion + 1} affichée dans la salle ${roomCode}`);
+    console.log(`Question ${room.currentQuestion + 1} affichée (valeur +${room.currentQuestionValue}) dans la salle ${roomCode}`);
   });
 
   // Masquer la question de tous les joueurs
@@ -308,7 +328,7 @@ const STAGE_QUALIFIERS = {
     console.log(`Question ${room.currentQuestion + 1} activée dans la salle ${roomCode}`);
 
     // Démarrer le compte à rebours du buzzer
-    let buzzerCountdown = 10;
+    let buzzerCountdown = 20;
     io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
 
     room.timers.buzzer = setInterval(() => {
@@ -345,8 +365,17 @@ const STAGE_QUALIFIERS = {
     const player = room.players.find(p => p.id === socket.id);
     if (!player) return;
 
+    // Tie-break: restreindre le buzzer aux candidats uniquement
+    if (room.tieBreak?.isActive) {
+      if (!room.tieBreak.candidates.includes(socket.id)) {
+        return;
+      }
+    }
+
     // Bloquer les joueurs éliminés
     if (player.status === 'eliminated') return;
+    // Empêcher un joueur ayant déjà répondu incorrectement sur cette question de rebuzzer
+    if (player.status === 'incorrect') return;
 
     // Premier joueur à presser le buzzer
     room.buzzer.playerId = socket.id;
@@ -361,13 +390,16 @@ const STAGE_QUALIFIERS = {
       }
     });
 
-    const currentQ = room.questions[room.currentQuestion];
+    const currentQ = room.tieBreak?.isActive ? room.tieBreak.question : room.questions[room.currentQuestion];
 
     // Envoyer la question au joueur sélectionné
     socket.emit('show-question', {
       question: currentQ,
-      questionNumber: room.currentQuestion + 1,
-      totalQuestions: room.questions.length
+      questionNumber: room.tieBreak?.isActive ? null : room.currentQuestion + 1,
+      totalQuestions: room.tieBreak?.isActive ? null : room.questions.length,
+      questionValue: room.currentQuestionValue,
+      isTieBreak: !!room.tieBreak?.isActive,
+      tieBreak: room.tieBreak || null,
     });
 
     // Notifier tous les autres participants
@@ -375,13 +407,15 @@ const STAGE_QUALIFIERS = {
       playerId: socket.id,
       playerName: player.name,
       gameState: room.gameState,
-      players: room.players
+      players: room.players,
+      isTieBreak: !!room.tieBreak?.isActive,
+      tieBreak: room.tieBreak || null,
     });
 
     console.log(`${player.name} a pressé le buzzer dans la salle ${roomCode}`);
 
     // Démarrer le compte à rebours pour la réponse
-    let answerCountdown = 15;
+    let answerCountdown = 40;
     io.to(roomCode).emit('timer-update', { type: 'answer', countdown: answerCountdown });
 
     room.timers.answer = setInterval(() => {
@@ -391,20 +425,51 @@ const STAGE_QUALIFIERS = {
       if (answerCountdown === 0) {
         clearInterval(room.timers.answer);
         if (room.gameState === 'answering') {
-          // Temps écoulé, considérer comme une mauvaise réponse (sans pénalité)
+          // Temps écoulé, considérer comme une mauvaise réponse et réactiver le buzzer
           player.status = 'incorrect';
-          room.gameState = 'results';
 
-          io.to(roomCode).emit('answer-result', {
-            playerId: socket.id,
-            playerName: player.name,
-            isTimeout: true,
-            isCorrect: false,
-            question: room.questions[room.currentQuestion],
-            scores: room.scores,
-            players: room.players,
-            gameState: room.gameState
+          // Réactiver le buzzer pour les autres joueurs
+          room.gameState = 'buzzer_active';
+          room.buzzer = { active: true, playerId: null, timestamp: null };
+          room.players.forEach(p => {
+            if (p.id !== player.id) {
+              const shouldWait = room.tieBreak?.isActive ? room.tieBreak.candidates.includes(p.id) : true;
+              p.status = p.status === 'eliminated' ? 'eliminated' : (shouldWait ? 'waiting' : 'blocked');
+            }
           });
+
+          io.to(roomCode).emit('buzzer-activated', {
+            gameState: room.gameState,
+            currentQuestion: room.tieBreak?.isActive ? null : room.currentQuestion,
+            players: room.players,
+            isTieBreak: !!room.tieBreak?.isActive,
+            tieBreak: room.tieBreak || null,
+          });
+
+          // Redémarrer le compte à rebours du buzzer
+          let buzzerCountdown = 20;
+          io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+          room.timers.buzzer = setInterval(() => {
+            buzzerCountdown--;
+            io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+            if (buzzerCountdown === 0) {
+              clearInterval(room.timers.buzzer);
+              if (room.gameState === 'buzzer_active') {
+                room.gameState = 'results';
+                io.to(roomCode).emit('answer-result', {
+                  isTimeout: true,
+                  question: currentQ,
+                  scores: room.scores,
+                  players: room.players,
+                  gameState: room.gameState,
+                  isTieBreak: !!room.tieBreak?.isActive,
+                  tieBreak: room.tieBreak || null,
+                });
+              }
+            }
+          }, 1000);
         }
       }
     }, 1000);
@@ -420,39 +485,330 @@ const STAGE_QUALIFIERS = {
     // Arrêter le compte à rebours de la réponse
     clearInterval(room.timers.answer);
 
-    const currentQ = room.questions[room.currentQuestion];
+    const currentQ = room.tieBreak?.isActive ? room.tieBreak.question : room.questions[room.currentQuestion];
     const isCorrect = answer === currentQ.correct;
     const player = room.players.find(p => p.id === socket.id);
 
     if (isCorrect) {
-      room.scores[socket.id] += 10;
-      player.score += 10;
+      const gained = room.currentQuestionValue ?? 10;
+      room.scores[socket.id] += gained;
+      player.score += gained;
       player.status = 'correct';
+
+      room.gameState = 'results';
+
+      // Envoyer le résultat à tous
+      io.to(roomCode).emit('answer-result', {
+        playerId: socket.id,
+        playerName: player.name,
+        answer: answer,
+        correct: currentQ.correct,
+        correctAnswer: currentQ.options[currentQ.correct],
+        isCorrect: isCorrect,
+        question: currentQ,
+        questionValue: room.currentQuestionValue,
+        scores: room.scores,
+        players: room.players,
+        gameState: room.gameState,
+        isTieBreak: !!room.tieBreak?.isActive,
+        tieBreak: room.tieBreak || null,
+      });
+
+      console.log(`${player.name} a répondu correctement (+${gained}) dans la salle ${roomCode}`);
+
+      // Avancer automatiquement après un court délai
+      setTimeout(() => {
+        const r = rooms.get(roomCode);
+        if (!r) return;
+        if (r.gameState !== 'results') return;
+
+        // Gestion spécifique tie-break: ne pas avancer l'index de question
+        if (r.tieBreak?.isActive) {
+          // Recalculer le classement et vérifier résolution du tie-break
+          const finalRanking = r.players
+            .map(pl => ({ ...pl, score: r.scores[pl.id] }))
+            .sort((a, b) => b.score - a.score);
+
+          const qualifiersCount = getQualifiersCount(r.stage, r.players.length);
+          const K = qualifiersCount;
+          const cutoffScore = finalRanking[K - 1]?.score ?? null;
+          const countAbove = cutoffScore === null ? 0 : finalRanking.filter(p => p.score > cutoffScore).length;
+          const candidates = cutoffScore === null ? [] : finalRanking.filter(p => p.score === cutoffScore).map(p => p.id);
+          const slotsToFill = Math.max(0, K - countAbove);
+
+          if (cutoffScore !== null && candidates.length > slotsToFill && slotsToFill > 0) {
+            // Toujours ex aequo → informer l’hôte, prêt pour une nouvelle question supplémentaire
+            r.gameState = 'question_active';
+            r.buzzer = { active: false, playerId: null, timestamp: null };
+            r.players.forEach(p => {
+              const shouldWait = r.tieBreak.candidates.includes(p.id);
+              p.status = p.status === 'eliminated' ? 'eliminated' : (shouldWait ? 'waiting' : 'blocked');
+            });
+
+            io.to(roomCode).emit('tiebreak-still-tied', {
+              stage: r.stage,
+              candidates: r.tieBreak.candidates,
+              slotsToFill: r.tieBreak.slotsToFill,
+              askedCount: r.tieBreak.askedCount,
+              maxQuestions: r.tieBreak.maxQuestions,
+            });
+          } else {
+            // Tie-break résolu → clôturer la manche
+            const qualified = finalRanking.slice(0, qualifiersCount).map(p => p.id);
+            const eliminated = finalRanking.slice(qualifiersCount).map(p => p.id);
+
+            r.players.forEach(p => {
+              if (qualified.includes(p.id)) {
+                p.status = r.stage === 'finale' ? 'winner' : 'qualified';
+              } else {
+                p.status = 'eliminated';
+              }
+            });
+
+            r.tieBreak = null;
+            r.gameState = 'finished';
+
+            io.to(roomCode).emit('stage-finished', {
+              finalRanking,
+              scores: r.scores,
+              stage: r.stage,
+              qualifiersCount,
+              qualified,
+              eliminated,
+            });
+
+            if (r.stage === 'finale') {
+              io.to(roomCode).emit('game-finished', {
+                finalRanking,
+                scores: r.scores,
+                stage: r.stage
+              });
+            }
+          }
+        } else {
+          // Flux normal: avancer à la prochaine question
+          r.currentQuestion++;
+          if (r.currentQuestion >= r.questions.length) {
+            // Fin de manche (flux normal)
+            r.gameState = 'finished';
+
+            const finalRanking = r.players
+              .map(pl => ({ ...pl, score: r.scores[pl.id] }))
+              .sort((a, b) => b.score - a.score);
+
+            const qualifiersCount = getQualifiersCount(r.stage, r.players.length);
+            const K = qualifiersCount;
+            const cutoffScore = finalRanking[K - 1]?.score ?? null;
+            const countAbove = cutoffScore === null ? 0 : finalRanking.filter(p => p.score > cutoffScore).length;
+            const candidates = cutoffScore === null ? [] : finalRanking.filter(p => p.score === cutoffScore).map(p => p.id);
+            const slotsToFill = Math.max(0, K - countAbove);
+
+            if (cutoffScore !== null && candidates.length > slotsToFill && slotsToFill > 0) {
+              r.tieBreak = {
+                isActive: false,
+                candidates,
+                slotsToFill,
+                askedCount: 0,
+                maxQuestions: 3,
+              };
+
+              io.to(roomCode).emit('tiebreak-ready', {
+                stage: r.stage,
+                candidates,
+                slotsToFill,
+              });
+            } else {
+              const qualified = finalRanking.slice(0, qualifiersCount).map(p => p.id);
+              const eliminated = finalRanking.slice(qualifiersCount).map(p => p.id);
+
+              r.players.forEach(p => {
+                if (qualified.includes(p.id)) {
+                  p.status = r.stage === 'finale' ? 'winner' : 'qualified';
+                } else {
+                  p.status = 'eliminated';
+                }
+              });
+
+              io.to(roomCode).emit('stage-finished', {
+                finalRanking,
+                scores: r.scores,
+                stage: r.stage,
+                qualifiersCount,
+                qualified,
+                eliminated,
+              });
+
+              if (r.stage === 'finale') {
+                io.to(roomCode).emit('game-finished', {
+                  finalRanking,
+                  scores: r.scores,
+                  stage: r.stage
+                });
+              }
+            }
+
+            // Ne pas émettre 'next-question' après une fin de manche.
+            // La suite (choix de la nouvelle manche) est contrôlée par l'hôte.
+
+
+          } else {
+            // Passer à la prochaine question dans la manche
+            r.gameState = 'question_active';
+            r.buzzer = { active: false, playerId: null, timestamp: null };
+            r.players.forEach(p => {
+              p.status = p.status === 'eliminated' ? 'eliminated' : 'waiting';
+            });
+
+            io.to(roomCode).emit('next-question', {
+              currentQuestion: r.currentQuestion,
+              gameState: r.gameState,
+              players: r.players,
+              totalQuestions: r.questions.length
+            });
+          }
+        }
+      }, 2000);
     } else {
-      // Mauvaise réponse sans pénalité
+      // Mauvaise réponse: marquer le joueur et réactiver le buzzer pour les autres
       player.status = 'incorrect';
+
+      // Réactiver le buzzer sur la même question
+      room.gameState = 'buzzer_active';
+      room.buzzer = { active: true, playerId: null, timestamp: null };
+
+      room.players.forEach(p => {
+        if (p.id !== player.id) {
+          const shouldWait = room.tieBreak?.isActive ? room.tieBreak.candidates.includes(p.id) : true;
+          p.status = p.status === 'eliminated' ? 'eliminated' : (shouldWait ? 'waiting' : 'blocked');
+        }
+      });
+
+      io.to(roomCode).emit('buzzer-activated', {
+        gameState: room.gameState,
+        currentQuestion: room.tieBreak?.isActive ? null : room.currentQuestion,
+        players: room.players,
+        isTieBreak: !!room.tieBreak?.isActive,
+        tieBreak: room.tieBreak || null,
+      });
+
+      console.log(`${player.name} a répondu incorrectement. Réactivation du buzzer dans la salle ${roomCode}`);
+
+      // Relancer le compte à rebours du buzzer
+      let buzzerCountdown = 20;
+      io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+      room.timers.buzzer = setInterval(() => {
+        buzzerCountdown--;
+        io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+        if (buzzerCountdown === 0) {
+          clearInterval(room.timers.buzzer);
+          if (room.gameState === 'buzzer_active') {
+            room.gameState = 'results';
+            const q = room.tieBreak?.isActive ? room.tieBreak.question : room.questions[room.currentQuestion];
+            io.to(roomCode).emit('answer-result', {
+              isTimeout: true,
+              question: q,
+              scores: room.scores,
+              players: room.players,
+              gameState: room.gameState,
+              isTieBreak: !!room.tieBreak?.isActive,
+              tieBreak: room.tieBreak || null,
+            });
+          }
+        }
+      }, 1000);
     }
-
-    room.gameState = 'results';
-
-    // Envoyer le résultat à tous
-    io.to(roomCode).emit('answer-result', {
-      playerId: socket.id,
-      playerName: player.name,
-      answer: answer,
-      correct: currentQ.correct,
-      correctAnswer: currentQ.options[currentQ.correct],
-      isCorrect: isCorrect,
-      question: currentQ,
-      scores: room.scores,
-      players: room.players,
-      gameState: room.gameState
-    });
-
-    console.log(`${player.name} a répondu ${isCorrect ? 'correctement' : 'incorrectement'} dans la salle ${roomCode}`);
   });
 
-  // Question suivante
+  // Lancer un tie-break côté hôte
+  socket.on('host-start-tiebreak', (data) => {
+    const { roomCode, maxQuestions } = data || {};
+    const room = rooms.get(roomCode);
+    if (!room || room.host.id !== socket.id) return;
+
+    if (!room.tieBreak || !room.tieBreak.candidates || room.tieBreak.slotsToFill <= 0) {
+      socket.emit('error', { message: 'Aucun tie-break nécessaire.' });
+      return;
+    }
+
+    // Activer le tie-break
+    room.tieBreak.isActive = true;
+    if (typeof maxQuestions === 'number' && maxQuestions % 2 === 1) {
+      room.tieBreak.maxQuestions = maxQuestions;
+    }
+
+    // Choisir une question unique (non posée auparavant)
+    const allPools = Object.values(room.stageSets || {}).flat();
+    const available = allPools.filter(q => !room.askedQuestionIds.has(q.id));
+    if (available.length === 0) {
+      socket.emit('error', { message: 'Plus de questions disponibles pour le tie-break.' });
+      return;
+    }
+    const selected = available[Math.floor(Math.random() * available.length)];
+    room.tieBreak.question = selected;
+    room.currentQuestionValue = Math.random() < 0.5 ? 5 : 10;
+    room.askedQuestionIds.add(selected.id);
+    room.tieBreak.askedCount = (room.tieBreak.askedCount || 0) + 1;
+
+    // Afficher la question tie-break et activer le buzzer pour les candidats
+    room.gameState = 'question_displayed';
+
+    io.to(roomCode).emit('question-displayed', {
+      question: selected,
+      questionNumber: null,
+      totalQuestions: null,
+      gameState: room.gameState,
+      questionValue: room.currentQuestionValue,
+      isTieBreak: true,
+      tieBreak: room.tieBreak,
+    });
+
+    // Activer le buzzer pour les candidats
+    room.gameState = 'buzzer_active';
+    room.buzzer = { active: true, playerId: null, timestamp: null };
+    room.players.forEach(p => {
+      const shouldWait = room.tieBreak.candidates.includes(p.id);
+      p.status = p.status === 'eliminated' ? 'eliminated' : (shouldWait ? 'waiting' : 'blocked');
+    });
+
+    io.to(roomCode).emit('buzzer-activated', {
+      gameState: room.gameState,
+      currentQuestion: null,
+      players: room.players,
+      isTieBreak: true,
+      tieBreak: room.tieBreak,
+    });
+
+    console.log(`Tie-break lancé: ${room.tieBreak.candidates.length} candidats, ${room.tieBreak.slotsToFill} place(s) à pourvoir.`);
+
+    // Démarrer le compte à rebours du buzzer
+    let buzzerCountdown = 20;
+    io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+    room.timers.buzzer = setInterval(() => {
+      buzzerCountdown--;
+      io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: buzzerCountdown });
+
+      if (buzzerCountdown === 0) {
+        clearInterval(room.timers.buzzer);
+        if (room.gameState === 'buzzer_active') {
+          room.gameState = 'results';
+          io.to(roomCode).emit('answer-result', {
+            isTimeout: true,
+            question: room.tieBreak.question,
+            scores: room.scores,
+            players: room.players,
+            gameState: room.gameState,
+            isTieBreak: true,
+            tieBreak: room.tieBreak,
+          });
+        }
+      }
+    }, 1000);
+  });
+
+  // Question suivante (contrôle hôte)
   socket.on('next-question', (roomCode) => {
     const room = rooms.get(roomCode);
     if (!room || room.host.id !== socket.id) return;
@@ -471,7 +827,7 @@ const STAGE_QUALIFIERS = {
         }))
         .sort((a, b) => b.score - a.score);
 
-      const qualifiersCount = STAGE_QUALIFIERS[room.stage] || 0;
+      const qualifiersCount = getQualifiersCount(room.stage, room.players.length);
       const qualified = finalRanking.slice(0, qualifiersCount).map(p => p.id);
       const eliminated = finalRanking.slice(qualifiersCount).map(p => p.id);
 
@@ -534,24 +890,14 @@ const STAGE_QUALIFIERS = {
         // L'hôte s'est déconnecté, supprimer la salle
         io.to(roomCode).emit('host-disconnected');
         rooms.delete(roomCode);
-        // Émettre l'état global mis à jour (peut redevenir aucune salle active)
-        io.emit('active-room-status', { exists: rooms.size > 0 });
-        console.log(`Salle ${roomCode} supprimée (hôte déconnecté)`);
       } else {
-        // Un joueur s'est déconnecté
-        const playerIndex = room.players.findIndex(p => p.id === socket.id);
-        if (playerIndex !== -1) {
-          const playerName = room.players[playerIndex].name;
-          room.players.splice(playerIndex, 1);
+        // Retirer le joueur
+        const index = room.players.findIndex(p => p.id === socket.id);
+        if (index !== -1) {
+          const [removed] = room.players.splice(index, 1);
           delete room.scores[socket.id];
-          
-          io.to(roomCode).emit('player-left', {
-            players: room.players,
-            scores: room.scores,
-            playerName
-          });
-          
-          console.log(`${playerName} a quitté la salle ${roomCode}`);
+          io.to(roomCode).emit('player-left', { players: room.players, scores: room.scores });
+          console.log(`Joueur ${removed?.name || socket.id} quitté la salle ${roomCode}`);
         }
       }
     }

@@ -129,6 +129,22 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
 
   const selectedPlayer = room.players.find(p => p.status === 'selected') || null;
 
+  // Libellés complets des manches pour le moniteur
+  const formatStageLabel = (stage?: string) => {
+    switch (stage) {
+      case 'premiere':
+        return 'Premiere manche';
+      case 'huitiemes':
+        return 'Huitiemes de finale';
+      case 'demi':
+        return 'Demi finale';
+      case 'finale':
+        return 'Finale';
+      default:
+        return stage || '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 p-4">
       <div className="max-w-6xl mx-auto">
@@ -140,7 +156,7 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Moniteur de Salle</h1>
                 <p className="text-gray-600">Statut: {stateLabel}</p>
-                {room.stage && <p className="text-sm text-gray-500">Manche: <span className="font-semibold capitalize">{room.stage}</span></p>}
+                {room.stage && <p className="text-sm text-gray-500">Manche: <span className="font-semibold">{formatStageLabel(room.stage)}</span></p>}
               </div>
             </div>
             <div className="text-center">
@@ -150,6 +166,25 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
           </div>
         </div>
 
+        {room.stage && (
+          <div className="flex justify-center mb-6">
+            <div className="max-w-3xl w-full text-center px-10 py-6 rounded-3xl border-4 border-orange-500 bg-orange-100 shadow-xl">
+              <div className="text-4xl md:text-6xl font-black text-orange-700 uppercase tracking-wide">
+                {formatStageLabel(room.stage)}
+              </div>
+              <div className="text-sm md:text-base text-orange-600 mt-2">Manche en cours</div>
+            </div>
+          </div>
+        )}
+
+        {selectedPlayer && (
+          <div className="flex justify-center mb-6">
+            <div className="px-6 py-3 rounded-2xl bg-yellow-50 border-2 border-yellow-400 shadow-lg">
+              <span className="text-2xl md:text-3xl font-extrabold text-yellow-700 blink-strong">{selectedPlayer.name}</span>
+              <span className="ml-3 text-yellow-600 font-semibold">répond à la question</span>
+            </div>
+          </div>
+        )}
         {/* Contenu */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Question en cours */}
@@ -172,6 +207,13 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
             {questionToShow ? (
               <div>
                 <p className="text-gray-800 font-medium mb-4">{questionToShow.question}</p>
+                {typeof room.currentQuestionValue === 'number' && (
+                  <div className="mt-3">
+                    <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                      Valeur: +{room.currentQuestionValue} pts
+                    </span>
+                  </div>
+                )}
                 <div className="space-y-2">
                   {questionToShow.options.map((opt, idx) => {
                     const isCorrect = questionToShow && typeof questionToShow.correct === 'number' && idx === questionToShow.correct;
@@ -233,20 +275,30 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
                     player.status === 'correct' ? 'text-green-600' :
                     player.status === 'incorrect' ? 'text-red-600' :
                     'text-gray-600';
+                  // Nouvelle palette de couleurs de carte, alignée sur l'hôte
+                  const statusColors: Record<string, string> = {
+                    waiting: 'bg-gray-50 text-gray-700',
+                    selected: 'bg-blue-100 text-blue-700 ring-2 ring-blue-300',
+                    blocked: 'bg-red-100 text-red-700',
+                    correct: 'bg-green-100 text-green-700',
+                    incorrect: 'bg-red-100 text-red-700',
+                    qualified: 'bg-green-50 text-green-700 ring-2 ring-green-300',
+                    eliminated: 'bg-gray-200 text-gray-500',
+                    winner: 'bg-yellow-100 text-yellow-700 ring-2 ring-yellow-300',
+                  };
+                  const colorCls = statusColors[player.status] || 'bg-gray-50 text-gray-700';
                   return (
-                    <div key={player.id} className="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
+                    <div key={player.id} className={`rounded-xl p-4 flex items-center justify-between transition-all ${colorCls}`}>
                       <div className="flex items-center space-x-3">
                         <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
                           {player.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-800">#{index + 1} {player.name}</p>
+                          <p className="font-medium">#{index + 1} {player.name}</p>
                           <p className={`text-sm ${statusCls}`}>{statusLabel}</p>
                         </div>
                       </div>
-                      <div className="text-xl font-bold">
-                        {score} pts
-                      </div>
+                      <div className="text-xl font-bold">{score} pts</div>
                     </div>
                   );
                 })}

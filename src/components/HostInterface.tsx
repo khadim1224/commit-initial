@@ -12,6 +12,7 @@ interface HostInterfaceProps {
   onHideQuestionFromAll: () => void;
   onShowQuestionAndActivateBuzzer?: () => void;
   onSetStage?: (stage: TournamentStage) => void;
+  onStartTieBreak?: (maxQuestions?: number) => void;
 }
 
 export const HostInterface: React.FC<HostInterfaceProps> = ({
@@ -24,6 +25,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
   onHideQuestionFromAll,
   onShowQuestionAndActivateBuzzer,
   onSetStage,
+  onStartTieBreak,
 }) => {
   const { room, gameStatus, timers } = gameState;
   const correctAudioRef = useRef<HTMLAudioElement>(null);
@@ -201,6 +203,15 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 <div className="bg-gray-100 p-4 rounded-lg mb-4">
                   <p className="text-lg font-semibold">Question :</p>
                   <p>{room.questions[room.currentQuestion].question}</p>
+
+                  {/* Valeur de la question */}
+                  {typeof room.currentQuestionValue === 'number' && (
+                    <div className="mt-3">
+                      <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                        Valeur: +{room.currentQuestionValue} pts
+                      </span>
+                    </div>
+                  )}
                   
                   {/* Affichage des réponses colorées pour l'hôte */}
                   <div className="mt-4 pt-4 border-t">
@@ -233,6 +244,28 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 </div>
               )}
               
+              {/* Panneau tie-break */}
+              {room.tieBreak && room.tieBreak!.slotsToFill > 0 && (
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-lg font-semibold text-purple-800">Égalité détectée</p>
+                      <p className="text-sm text-purple-700">Places à attribuer: <span className="font-bold">{room.tieBreak!.slotsToFill}</span></p>
+                      <p className="text-sm text-purple-700">Candidats: {room.tieBreak!.candidates.map((id: string) => room.players.find(p => p.id === id)?.name || id).join(', ')}</p>
+                      <p className="text-xs text-purple-600 mt-1">Questions posées: {room.tieBreak!.askedCount} / {room.tieBreak!.maxQuestions}</p>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => onStartTieBreak && onStartTieBreak(room.tieBreak!.maxQuestions)}
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-xl"
+                      >
+                        Question supplémentaire
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {(room.gameState === 'waiting' || room.gameState === 'question_active') && (
                   <button
@@ -274,7 +307,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                     {room.players.find(p => p.status === 'selected') && (
                       <div className="mt-3">
                         <p className="text-sm text-yellow-700 font-semibold">Joueur ayant buzzé en premier</p>
-                        <p className="text-lg text-yellow-900 font-bold">{room.players.find(p => p.status === 'selected')?.name}</p>
+                        <p className="text-lg text-yellow-900 font-bold blink-strong">{room.players.find(p => p.status === 'selected')?.name}</p>
                       </div>
                     )}
                   </div>
@@ -288,7 +321,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                     {room.players.find(p => p.status === 'selected') && (
                       <div className="mt-3">
                         <p className="text-sm text-blue-700 font-semibold">Joueur ayant buzzé en premier</p>
-                        <p className="text-lg text-blue-900 font-bold">{room.players.find(p => p.status === 'selected')?.name}</p>
+                        <p className="text-lg text-blue-900 font-bold blink-fast">{room.players.find(p => p.status === 'selected')?.name}</p>
                       </div>
                     )}
                   </div>
@@ -330,7 +363,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                             #{index + 1}
                           </div>
                           <div>
-                            <p className="font-semibold">{player.name}</p>
+                            <p className={`font-semibold ${player.status === 'selected' ? 'blink-fast' : ''}`}>{player.name}</p>
                             <p className="text-sm opacity-75">
                               {player.status === 'selected' && 'En train de répondre'}
                               {player.status === 'blocked' && 'Bloqué'}

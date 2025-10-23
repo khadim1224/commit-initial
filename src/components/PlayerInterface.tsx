@@ -19,9 +19,11 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
   const buzzerAudioRef = useRef<HTMLAudioElement>(null);
 
   const handleBuzzerPress = () => {
-    if (buzzerAudioRef.current) {
-      buzzerAudioRef.current.play();
-    }
+    try {
+      // Utiliser un objet Audio indépendant pour éviter l’arrêt lors du re-render
+      const a = new Audio('/sounds/buzzer.mp3');
+      a.play().catch(() => {});
+    } catch {}
     onPressBuzzer();
   };
 
@@ -138,7 +140,13 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   {currentQuestion.question}
                 </h3>
-                
+                {typeof room.currentQuestionValue === 'number' && (
+                  <div className="mb-4">
+                    <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                      Valeur: +{room.currentQuestionValue} pts
+                    </span>
+                  </div>
+                )}
                 <div className="space-y-3">
                   {currentQuestion.options.map((option, index) => (
                     <button
@@ -167,6 +175,13 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         {currentQuestion.question}
                     </h3>
+                    {typeof room.currentQuestionValue === 'number' && (
+                      <div className="mb-4">
+                        <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                          Valeur: +{room.currentQuestionValue} pts
+                        </span>
+                      </div>
+                    )}
                 </div>
             )}
 
@@ -188,6 +203,14 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                     <p className="mt-4 text-gray-600">
                       Temps restant: {timers.buzzer}s
                     </p>
+                  </div>
+                )}
+
+                {room.gameState === 'buzzer_active' && currentPlayer?.status === 'incorrect' && (
+                  <div className="py-12">
+                    <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                    <p className="text-red-600 text-lg font-semibold">Réponse incorrecte.</p>
+                    <p className="text-gray-600">Vous ne pouvez plus buzzer sur cette question.</p>
                   </div>
                 )}
 
@@ -229,7 +252,7 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                     {currentPlayer?.status === 'correct' && (
                       <>
                         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                        <p className="text-green-600 text-lg font-semibold">Bonne réponse! +10 points</p>
+                        <p className="text-green-600 text-lg font-semibold">Bonne réponse! +{room.currentQuestionValue ?? 10} points</p>
                       </>
                     )}
                     {currentPlayer?.status === 'incorrect' && (
