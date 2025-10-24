@@ -341,35 +341,60 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
     
     const myFinalPosition = finalRanking.findIndex(p => p.name === userName) + 1;
     const myFinalScore = finalRanking.find(p => p.name === userName)?.score || 0;
+    const isFinale = room.stage === 'finale';
+    const myStatus = room.players.find(p => p.name === userName)?.status;
+
+    const cardStyle = myStatus === 'qualified'
+      ? 'bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-400'
+      : myStatus === 'eliminated'
+      ? 'bg-gradient-to-r from-red-100 to-red-200 border-2 border-red-400'
+      : myFinalPosition === 1
+      ? 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-400'
+      : myFinalPosition <= 3
+      ? 'bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-400'
+      : 'bg-gray-100 border-2 border-gray-300';
+
+    const emoji = myStatus === 'qualified'
+      ? '✅'
+      : myStatus === 'eliminated'
+      ? '🏁'
+      : myFinalPosition === 1
+      ? '🥇'
+      : myFinalPosition === 2
+      ? '🥈'
+      : myFinalPosition === 3
+      ? '🥉'
+      : '🏁';
+
+    const titleText = myStatus === 'qualified'
+      ? 'Qualifié(e) pour la prochaine manche !'
+      : myStatus === 'eliminated'
+      ? 'Bonne participation! Vous êtes éliminé(e).'
+      : myFinalPosition === 1
+      ? 'Félicitations!'
+      : myFinalPosition <= 3
+      ? 'Bien joué!'
+      : 'Bonne participation!';
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 p-4">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
             <Trophy className="w-20 h-20 text-yellow-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Partie Terminée!</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{isFinale ? 'Partie Terminée!' : 'Manche terminée !'}</h1>
             
             {/* Résultat personnel */}
-            <div className={`p-6 rounded-xl mb-6 ${
-              myFinalPosition === 1 ? 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-2 border-yellow-400' :
-              myFinalPosition <= 3 ? 'bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-400' :
-              'bg-gray-100 border-2 border-gray-300'
-            }`}>
-              <div className="text-4xl mb-2">
-                {myFinalPosition === 1 ? '🥇' : myFinalPosition === 2 ? '🥈' : myFinalPosition === 3 ? '🥉' : '🏁'}
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800">
-                {myFinalPosition === 1 ? 'Félicitations!' : 
-                 myFinalPosition <= 3 ? 'Bien joué!' : 'Bonne participation!'}
-              </h2>
+            <div className={`p-6 rounded-xl mb-6 ${cardStyle}`}>
+              <div className="text-4xl mb-2">{emoji}</div>
+              <h2 className="text-2xl font-bold text-gray-800">{titleText}</h2>
               <p className="text-lg text-gray-600 mt-2">
                 Position: #{myFinalPosition} - Score: {myFinalScore} points
               </p>
             </div>
 
-            {/* Classement complet */}
+            {/* Classement */}
             <div className="text-left mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 text-center">Classement Final</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 text-center">{isFinale ? 'Classement Final' : 'Classement de la manche'}</h3>
               <div className="space-y-2">
                 {finalRanking.map((player, index) => (
                   <div 
@@ -400,13 +425,11 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
             >
               Retour à l'Accueil
             </button>
-          </div>
         </div>
       </div>
+    </div>
     );
   }
 
   return null;
 };
-
-// ... existing code ...

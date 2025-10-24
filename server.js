@@ -161,7 +161,9 @@ const STAGE_QUALIFIERS = {
   // Calcul dynamique des qualifiés selon la manche et le nombre de joueurs
   function getQualifiersCount(stage, playerCount) {
     if (stage === 'finale') return 1;
-    if (stage === 'premiere') return Math.max(1, Math.floor(playerCount / 2));
+    // Ajustement: en première manche, on qualifie la moitié ARRONDIE AU SUPÉRIEUR
+    // Ex.: 19 joueurs -> 10 qualifiés (9 éliminés)
+    if (stage === 'premiere') return Math.max(1, Math.ceil(playerCount / 2));
     if (stage === 'huitiemes') return Math.max(1, Math.floor((2 * playerCount) / 5));
     if (stage === 'demi') return Math.max(1, Math.floor(playerCount / 2));
     return Math.max(1, Math.floor(playerCount / 2));

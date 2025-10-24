@@ -164,6 +164,15 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
               <p className="text-sm text-gray-500 mt-1">Code de la salle</p>
             </div>
           </div>
+        {room.tieBreak && room.tieBreak.slotsToFill > 0 && (
+        <div className="mt-4 text-center">
+        <div className="inline-block px-5 py-2 rounded-xl bg-purple-100 text-purple-700 font-bold uppercase tracking-wide">Ex aequo</div>
+        <p className="mt-2 text-sm text-purple-700">
+        {room.tieBreak.candidates.map((id: string) => room.players.find(p => p.id === id)?.name || id).join(', ')}
+        </p>
+        <p className="text-xs text-purple-600">Questions supplémentaires pour départager.</p>
+        </div>
+        )}
         </div>
 
         {room.stage && (
@@ -246,14 +255,6 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
             )}
           </div>
 
-          {/* Bandeau tie-break (moniteur) */}
-          {room.tieBreak && room.tieBreak.slotsToFill > 0 && (
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
-              <p className="text-purple-800 font-semibold">Égalité détectée</p>
-              <p className="text-purple-700">Candidats: {room.tieBreak.candidates.map((id: string) => room.players.find(p => p.id === id)?.name || id).join(', ')}</p>
-              <p className="text-purple-700">Ils vont jouer des questions supplémentaires pour être départagés.</p>
-            </div>
-          )}
 
           {/* Classement */}
           <div className="bg-white rounded-2xl shadow-2xl p-6">
