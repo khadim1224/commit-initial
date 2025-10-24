@@ -266,6 +266,40 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 </div>
               )}
 
+              {/* Aperçu de la question supplémentaire pour l’hôte */}
+              {room.tieBreak && room.tieBreak!.isActive && room.tieBreak!.question && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                  <p className="text-lg font-semibold text-blue-800">Aperçu de la question supplémentaire</p>
+                  <div className="mt-2">
+                    {typeof room.currentQuestionValue === 'number' && (
+                      <p className="text-sm text-gray-700">
+                        Valeur: <span className="font-semibold text-indigo-600">+{room.currentQuestionValue} pts</span>
+                      </p>
+                    )}
+                    <p className="mt-1 text-gray-900">{room.tieBreak!.question!.question}</p>
+                    <div className="mt-3 space-y-2">
+                      {room.tieBreak!.question!.options.map((opt: string, idx: number) => {
+                        const isCorrect = typeof room.tieBreak!.question!.correct === 'number' && idx === room.tieBreak!.question!.correct;
+                        const base = 'p-2 border rounded-lg flex items-center';
+                        const cls = isCorrect
+                          ? `${base} bg-green-50 border-green-300 text-green-700`
+                          : `${base} bg-white border-gray-200 text-gray-800`;
+                        return (
+                          <div key={idx} className={cls}>
+                            <span className={`w-6 h-6 mr-2 flex items-center justify-center rounded-full ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                              {String.fromCharCode(65 + idx)}
+                            </span>
+                            <span>{opt}</span>
+                            {isCorrect && <span className="ml-2 text-green-600 font-semibold">✓ Correcte</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-blue-700 mt-2">Prévisualisation hôte seulement. Cliquez sur “Afficher la question et activer le buzzer” pour la montrer aux joueurs.</p>
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {(room.gameState === 'waiting' || room.gameState === 'question_active') && (
                   <button
@@ -344,7 +378,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                     const statusColors: Record<string, string> = {
                       waiting: 'bg-gray-100 text-gray-600',
                       selected: 'bg-blue-100 text-blue-600 ring-2 ring-blue-300',
-                      blocked: 'bg-red-100 text-red-600',
+                      blocked: 'bg-blue-100 text-blue-600',
                       correct: 'bg-green-100 text-green-600',
                       incorrect: 'bg-red-100 text-red-600',
                       qualified: 'bg-green-50 text-green-700 ring-2 ring-green-300',

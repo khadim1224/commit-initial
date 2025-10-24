@@ -246,6 +246,15 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
             )}
           </div>
 
+          {/* Bandeau tie-break (moniteur) */}
+          {room.tieBreak && room.tieBreak.slotsToFill > 0 && (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
+              <p className="text-purple-800 font-semibold">Égalité détectée</p>
+              <p className="text-purple-700">Candidats: {room.tieBreak.candidates.map((id: string) => room.players.find(p => p.id === id)?.name || id).join(', ')}</p>
+              <p className="text-purple-700">Ils vont jouer des questions supplémentaires pour être départagés.</p>
+            </div>
+          )}
+
           {/* Classement */}
           <div className="bg-white rounded-2xl shadow-2xl p-6">
             <div className="flex items-center space-x-3 mb-4">
@@ -271,7 +280,7 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
                     'En attente';
                   const statusCls =
                     player.status === 'selected' ? 'text-blue-600' :
-                    player.status === 'blocked' ? 'text-red-600' :
+                    player.status === 'blocked' ? 'text-blue-600' :
                     player.status === 'correct' ? 'text-green-600' :
                     player.status === 'incorrect' ? 'text-red-600' :
                     'text-gray-600';
@@ -279,7 +288,7 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
                   const statusColors: Record<string, string> = {
                     waiting: 'bg-gray-50 text-gray-700',
                     selected: 'bg-blue-100 text-blue-700 ring-2 ring-blue-300',
-                    blocked: 'bg-red-100 text-red-700',
+                    blocked: 'bg-blue-100 text-blue-700',
                     correct: 'bg-green-100 text-green-700',
                     incorrect: 'bg-red-100 text-red-700',
                     qualified: 'bg-green-50 text-green-700 ring-2 ring-green-300',

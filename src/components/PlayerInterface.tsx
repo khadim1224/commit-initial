@@ -125,6 +125,30 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
             </div>
           </div>
 
+          {/* Bandeau tie-break */}
+          {room.tieBreak?.isActive && (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
+              {(() => {
+                const candidates = room.tieBreak?.candidates || [];
+                const me = room.players.find(p => p.name === userName);
+                const isCandidate = !!me && candidates.includes(me.id);
+                const isQualified = me?.status === 'qualified' || me?.status === 'winner';
+                const isEliminated = me?.status === 'eliminated';
+                const otherNames = candidates.filter(id => id !== me?.id).map(id => room.players.find(p => p.id === id)?.name).filter(Boolean) as string[];
+                if (isCandidate) {
+                  return <p className="text-purple-800 font-medium">Vous êtes ex aequo avec {otherNames.join(', ')}. Des questions supplémentaires vont vous départager.</p>;
+                }
+                if (isQualified) {
+                  return <p className="text-green-800 font-medium">Vous êtes qualifié pour la prochaine manche. Le tie-break concerne les ex aequo.</p>;
+                }
+                if (isEliminated) {
+                  return <p className="text-red-800 font-medium">Vous êtes éliminé. Le tie-break départage les ex aequo restants.</p>;
+                }
+                return <p className="text-purple-800">Un tie-break est en cours pour départager les ex aequo. Merci de patienter.</p>;
+              })()}
+            </div>
+          )}
+
           {/* Zone de jeu principale */}
           <div className="bg-white rounded-2xl shadow-2xl p-6 mb-6">
             {/* Affichage de la question pour le joueur sélectionné */}
@@ -384,3 +408,5 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
 
   return null;
 };
+
+// ... existing code ...

@@ -247,6 +247,23 @@ const STAGE_QUALIFIERS = {
       return;
     }
 
+    // Si tie-break actif, afficher la question de tie-break sans modifier l'index courant
+    if (room.tieBreak?.isActive && room.tieBreak.question) {
+      room.gameState = 'question_displayed';
+      io.to(roomCode).emit('question-displayed', {
+        question: room.tieBreak.question,
+        questionNumber: null,
+        totalQuestions: null,
+        gameState: room.gameState,
+        questionValue: room.currentQuestionValue,
+        isTieBreak: true,
+        tieBreak: room.tieBreak,
+      });
+      console.log(`Question supplémentaire affichée (valeur +${room.currentQuestionValue}) dans la salle ${roomCode}`);
+      return;
+    }
+
+    // Flux normal
     room.gameState = 'question_displayed';
     const currentQ = room.questions[room.currentQuestion];
 
@@ -314,18 +331,30 @@ const STAGE_QUALIFIERS = {
       timestamp: null
     };
 
-    // Réinitialiser le statut des joueurs
+    // Réinitialiser le statut des joueurs, avec logique tie-break
     room.players.forEach(player => {
-      player.status = 'waiting';
+      if (room.tieBreak?.isActive) {
+        const isCandidate = room.tieBreak.candidates.includes(player.id);
+        if (player.status === 'eliminated' || player.status === 'qualified' || player.status === 'winner') {
+          // Conserver l’état pour les non-concernés
+          player.status = player.status;
+        } else {
+          player.status = isCandidate ? 'waiting' : 'blocked';
+        }
+      } else {
+        player.status = 'waiting';
+      }
     });
 
     io.to(roomCode).emit('buzzer-activated', {
       gameState: room.gameState,
-      currentQuestion: room.currentQuestion,
-      players: room.players
+      currentQuestion: room.tieBreak?.isActive ? null : room.currentQuestion,
+      players: room.players,
+      isTieBreak: !!room.tieBreak?.isActive,
+      tieBreak: room.tieBreak || null,
     });
 
-    console.log(`Question ${room.currentQuestion + 1} activée dans la salle ${roomCode}`);
+    console.log(`Question ${room.tieBreak?.isActive ? 'supplémentaire' : room.currentQuestion + 1} activée dans la salle ${roomCode}`);
 
     // Démarrer le compte à rebours du buzzer
     let buzzerCountdown = 20;
@@ -339,12 +368,15 @@ const STAGE_QUALIFIERS = {
         clearInterval(room.timers.buzzer);
         if (room.gameState === 'buzzer_active') {
           room.gameState = 'results';
+          const q = room.tieBreak?.isActive ? room.tieBreak.question : room.questions[room.currentQuestion];
           io.to(roomCode).emit('answer-result', {
             isTimeout: true,
-            question: room.questions[room.currentQuestion],
+            question: q,
             scores: room.scores,
             players: room.players,
-            gameState: room.gameState
+            gameState: room.gameState,
+            isTieBreak: !!room.tieBreak?.isActive,
+            tieBreak: room.tieBreak || null,
           });
         }
       }
