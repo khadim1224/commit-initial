@@ -701,7 +701,7 @@ const STAGE_QUALIFIERS = {
             });
           }
         }
-      }, 2000);
+      }, 6000);
     } else {
       // Mauvaise réponse: marquer le joueur et réactiver le buzzer pour les autres
       player.status = 'incorrect';
