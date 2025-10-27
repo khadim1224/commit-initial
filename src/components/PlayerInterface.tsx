@@ -125,7 +125,24 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
             </div>
           </div>
 
-          {/* Bandeau tie-break */}
+          {/* Bandeaux tie-break */}
+          {/* Information: tie-break prêt mais pas encore lancé */}
+          {room.tieBreak && !room.tieBreak.isActive && room.tieBreak.slotsToFill > 0 && (
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
+              {(() => {
+                const candidates = room.tieBreak?.candidates || [];
+                const me = room.players.find(p => p.name === userName);
+                const isCandidate = !!me && candidates.includes(me.id);
+                const otherNames = candidates.filter(id => id !== me?.id).map(id => room.players.find(p => p.id === id)?.name).filter(Boolean) as string[];
+                if (isCandidate) {
+                  return <p className="text-purple-800 font-medium">Égalité détectée avec {otherNames.join(', ')}. Une question supplémentaire va départager les ex aequo.</p>;
+                }
+                return <p className="text-purple-800">Un tie-break va commencer pour départager les ex aequo. Merci de patienter.</p>;
+              })()}
+            </div>
+          )}
+
+          {/* Information: tie-break en cours */}
           {room.tieBreak?.isActive && (
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
               {(() => {
@@ -308,15 +325,22 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
 
           {/* Mini classement */}
           <div className="bg-white rounded-2xl shadow-2xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
-              Top 3
-            </h3>
+            {(() => {
+              const topCount = (room.stage === 'premiere' || room.stage === 'huitiemes') ? 10 : 3;
+              return (
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+                  {`Top ${topCount}`}
+                </h3>
+              );
+            })()}
             <div className="space-y-2">
-              {room.players
-                .sort((a, b) => (room.scores[b.id] || 0) - (room.scores[a.id] || 0))
-                .slice(0, 3)
-                .map((player, index) => (
+              {(() => {
+                const topCount = (room.stage === 'premiere' || room.stage === 'huitiemes') ? 10 : 3;
+                return room.players
+                  .sort((a, b) => (room.scores[b.id] || 0) - (room.scores[a.id] || 0))
+                  .slice(0, topCount)
+                  .map((player, index) => (
                   <div 
                     key={player.id}
                     className={`p-3 rounded-lg flex items-center justify-between ${
@@ -325,7 +349,7 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                   >
                     <div className="flex items-center space-x-2">
                       <span className="text-lg">
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                       </span>
                       <span className={`font-medium ${player.name === userName ? 'text-blue-600' : 'text-gray-700'}`}>
                         {player.name}
@@ -335,7 +359,8 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                       {room.scores[player.id] || 0} pts
                     </span>
                   </div>
-                ))}
+                ));
+              })()}
             </div>
           </div>
         </div>

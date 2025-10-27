@@ -472,19 +472,40 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
       .map(player => ({ ...player, score: room.scores[player.id] || 0 }))
       .sort((a, b) => b.score - a.score);
 
+    // Déterminer quels joueurs afficher selon la manche
+    const playersToShow = (() => {
+      if (room.stage === 'premiere' || room.stage === 'huitiemes') {
+        // Pour première manche et huitièmes: afficher seulement les qualifiés
+        return sortedPlayers.filter(player => player.status === 'qualified' || player.status === 'winner');
+      } else {
+        // Pour demi-finale et finale: afficher tous les joueurs
+        return sortedPlayers;
+      }
+    })();
+
+    const titleText = (() => {
+      if (room.stage === 'premiere' || room.stage === 'huitiemes') {
+        return 'Joueurs Qualifiés!';
+      } else {
+        return 'Partie Terminée!';
+      }
+    })();
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
             <Trophy className="w-20 h-20 text-yellow-500 mx-auto mb-6" />
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Partie Terminée!</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">{titleText}</h1>
             <p className="text-xl text-gray-600 mb-8">Félicitations aux participants!</p>
 
             {/* Podium */}
             <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6">🏆 Classement Final</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+                🏆 {room.stage === 'premiere' || room.stage === 'huitiemes' ? 'Classement des Qualifiés' : 'Classement Final'}
+              </h2>
               <div className="space-y-4">
-                {sortedPlayers.slice(0, 5).map((player, index) => (
+                {playersToShow.map((player, index) => (
                   <div 
                     key={player.id}
                     className={`p-6 rounded-xl flex items-center justify-between ${

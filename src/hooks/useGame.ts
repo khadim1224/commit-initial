@@ -254,7 +254,7 @@ export const useGame = () => {
             candidates: data.candidates,
             slotsToFill: data.slotsToFill,
             askedCount: 0,
-            maxQuestions: 3,
+            maxQuestions: 10,
             question: null,
           }
         } : null,
