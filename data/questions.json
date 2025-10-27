@@ -1,0 +1,432 @@
+{
+  "premiere": [
+    {
+      "question": "Quel est le nom de l’expédition des explorateurs ?",
+      "options": ["Plastic Odyssey (V)", "Odyssey Plastic", "Odyssey Explorateur", "Plastic Explorateur"]
+    },
+    {
+      "question": "De quel port est parti le bateau ?",
+      "options": ["Dakar", "Marseille (V)", "Le Havre", "Nantes"]
+    },
+    {
+      "question": "Comment s’appelle capitaine du bateau ?",
+      "options": ["Jean", "Simon", "Yoann (V)", "Amadou"]
+    },
+    {
+      "question": "Où se trouve l’usine Plastic Factory de Dakar ?",
+      "options": ["Môle 1", "Môle 8", "Môle 10 (V)", "Môle 4"]
+    },
+    {
+      "question": "Combien d’activités contient le manuel des Apprentis Explorateurs ?",
+      "options": ["6", "8", "7 (V)", "10"]
+    },
+    {
+      "question": "Comment sont numérotées les activités dans le manuel ?",
+      "options": ["0 à 6 (V)", "1 à 7", "1 à 9", "1 à 5"]
+    },
+    {
+      "question": "Combien d’écoles participent au programme des Apprentis Explorateurs ?",
+      "options": ["20", "18", "27 (V)", "30"]
+    },
+    {
+      "question": "Combien de régions sont concernées par le Programme Apprentis Explorateurs en 2025 ?",
+      "options": ["2 (V)", "5", "14", "1"]
+    },
+    {
+      "question": "Les régions concernées par le Programme sont :",
+      "options": ["Dakar et Thiès", "Ziguinchor et Dakar", "Dakar et Saint-Louis (V)", "Dakar et Kaolack"]
+    },
+    {
+      "question": "Quel est l’intitulé de l’activité qui prépare à la « sortie de terrain » ?",
+      "options": ["Le sac de l’explorateur minimaliste (V)", "Préparer la sortie", "À nous, le terrain !", "L’expédition"]
+    },
+    {
+      "question": "Quelle activité transforme les apprentis explorateurs en organisateurs ?",
+      "options": ["Cap sur le terrain", "Le Conseil des explorateurs", "L’enquête des solutions", "La Grande Escale des Explorateurs (V)"]
+    },
+    {
+      "question": "Quelle activité fait davantage appel à la créativité des apprentis explorateurs ?",
+      "options": ["Cap sur le terrain", "Le Conseil des Explorateurs (V)", "L’enquête des solutions", "La Grande Escale des Explorateurs"]
+    },
+    {
+      "question": "Quelle activité est considérée comme la plus stratégique ?",
+      "options": ["Cap sur le terrain", "Le Conseil des Explorateurs", "L’enquête des solutions (V)", "La Grande Escale des Explorateurs"]
+    },
+    {
+      "question": "Quelle activité connecte les apprentis explorateurs à des personnes locales impliquées dans la lutte contre la pollution plastique ?",
+      "options": ["Cap sur le terrain", "Le Conseil des explorateurs", "L’enquête des solutions", "L’interview des acteurs du changement (V)"]
+    },
+    {
+      "question": "Qui est l’expéditeur de la lettre de mission aux apprentis explorateurs ?",
+      "options": ["Serge", "Simon (V)", "Seydou", "Sandrine"]
+    },
+    {
+      "question": "Dans combien de pays, le bateau fait-il escale ?",
+      "options": ["27", "30 (V)", "17", "10"]
+    },
+    {
+      "question": "Quel est le nom de l’association sénégalaise partenaire du programme Apprentis explorateurs",
+      "options": ["Enda", "Sénégal Plastic", "Joliba Institute (V)", "Plastindustrie"]
+    },
+    {
+      "question": "Quelle est la durée du tour du monde des explorateurs à bord du Plastic Odyssey ?",
+      "options": ["7 mois", "1 an", "3 ans (V)", "90 jours"]
+    },
+    {
+      "question": "Le plastique est principalement fabriqué à partir de :",
+      "options": ["Végétaux", "Pétrole (V)", "Eau", "Métal"]
+    },
+    {
+      "question": "Le nom scientifique du plastique est :",
+      "options": ["Polymère (V)", "Monomère", "Cellulose", "Hydrocarbure"]
+    },
+    {
+      "question": "Le premier plastique entièrement synthétique, créé en 1907, s'appelle :",
+      "options": ["Le Polyéthylène (PE)", "La Bakélite", "Le Polypropylène (PP) (V)", "Le Nylon"]
+    },
+    {
+      "question": "Quel est le symbole universel qui indique qu'un produit est recyclable ?",
+      "options": ["Un point vert", "Un arbre", "Le ruban de Möbius (trois flèches en triangle) (V)", "Une fleur"]
+    },
+    {
+      "question": "Le sigle \"PET\" que l'on trouve sur les bouteilles d'eau correspond à :",
+      "options": ["Un type de plastique transparent et léger (V)", "Une marque déposée", "Un label de qualité", "Un pays fabricant"]
+    },
+    {
+      "question": "Quelle propriété rend le plastique si populaire ?",
+      "options": ["Il est toujours cher", "Il est lourd et cassant", "Il est léger, résistant et malléable (V)", "Il se dégrade très vite"]
+    },
+    {
+      "question": "Le \"septième continent\" fait référence à :",
+      "options": ["Un nouveau continent découvert", "Une grande zone d'accumulation de déchets plastiques dans les océans (V)", "Un continent de glace", "Une forêt très dense"]
+    },
+    {
+      "question": "Combien de temps peut mettre une bouteille en plastique pour se dégrader dans la nature ?",
+      "options": ["5 ans", "50 ans", "100 à 1000 ans (V)", "1 an"]
+    },
+    {
+      "question": "Les microbilles de plastique que l'on trouvait dans certains cosmétiques sont surtout dangereuses car :",
+      "options": ["Elles sont chères", "Elles sont trop grosses", "Elles sont ingérées par la faune marine et entrent dans la chaîne alimentaire (V)", "Elles colorent l'eau"]
+    },
+    {
+      "question": "Qu'est-ce que la \"soupe plastique\" ?",
+      "options": ["Un nouveau plat à la mode", "Un mélange de déchets plastiques de toutes tailles, fragmentés, dans l'océan (V)", "La matière première pour fabriquer le plastique", "Un type de plastique biodégradable"]
+    },
+    {
+      "question": "Quel pourcentage estimé des déchets marins est constitué de plastique ?",
+      "options": ["20%", "50%", "80% (V)", "10%"]
+    },
+    {
+      "question": "Quel animal marin est souvent victime des sacs plastiques qu'il confond avec des méduses ?",
+      "options": ["Le requin", "La baleine", "La tortue (V)", "Le dauphin"]
+    }
+  ],
+  "huitiemes": [
+    {
+      "question": "Les \"filets fantômes\" sont :",
+      "options": ["Des filets de pêche biodégradables", "Des filets de pêche abandonnés qui continuent de capturer des animaux (V)", "Un jeu vidéo", "Un type de filet de sécurité"]
+    },
+    {
+      "question": "Qu'est-ce que les \"larmes de sirène\" ?",
+      "options": ["Des perles de verre", "Des billes de plastique industrielles (granulés) qui polluent les plages et les océans (V)", "Les larmes des sirènes dans les contes", "Un type de coquillage"]
+    },
+    {
+      "question": "La principale source de pollution plastique des océans vient :",
+      "options": ["Des navires et des bateaux de plaisance", "Des déchets jetés dans les rues et transportés par les rivières (V)", "Des usines en bord de mer", "De la pêche"]
+    },
+    {
+      "question": "Qu'est-ce que le \"microplastique\" ?",
+      "options": ["Un tout petit objet en plastique", "Un plastique de moins de 5 mm (V)", "Un plastique invisible à l'œil nu", "Un nouveau matériau"]
+    },
+    {
+      "question": "Comment les microplastiques sont-ils principalement formés ?",
+      "options": ["Ils sont fabriqués en usine", "Par la dégradation et la fragmentation de plus gros déchets plastiques (V)", "Par l'érosion des roches", "Par les cendres volcaniques"]
+    },
+    {
+      "question": "L'ingestion de plastique par les animaux peut provoquer :",
+      "options": ["Une sensation de satiété qui les empêche de se nourrir correctement", "Des blessures internes", "L'accumulation de substances toxiques dans leur corps", "Toutes les réponses précédentes (V)"]
+    },
+    {
+      "question": "Environ combien de bouteilles en plastique sont vendues chaque minute dans le monde ?",
+      "options": ["10 000", "100 000", "1 million (V)", "10 millions"]
+    },
+    {
+      "question": "La combustion à ciel ouvert des déchets plastiques libère des substances :",
+      "options": ["Bonnes pour les plantes", "Inoffensives", "Toxiques et cancérigènes dans l'air (V)", "Qui sentent bon"]
+    },
+    {
+      "question": "Que signifie le \"tri sélectif\" ?",
+      "options": ["Jeter tous ses déchets dans la même poubelle", "Séparer les déchets selon leur nature pour permettre leur recyclage (V)", "Ne jeter que le verre", "Trier ses déchets une fois par an"]
+    },
+    {
+      "question": "En France, dans quelle poubelle doit-on jeter une bouteille d'eau en plastique ?",
+      "options": ["La poubelle ordinaire (ou poubelle grise/verte)", "La poubelle jaune (V)", "La poubelle bleue", "La poubelle verte"]
+    },
+    {
+      "question": "Que doit-on faire avant de jeter un emballage en plastique dans la poubelle de tri ?",
+      "options": ["Le laver rapidement (le \"dégrossir\") (V)", "Le brûler", "Le casser en morceaux", "Rien, on le jette tel quel, même sale"]
+    },
+    {
+      "question": "Le symbole \"Point Vert\" sur un emballage signifie que :",
+      "options": ["L'emballage est recyclable", "Le produit est fabriqué en France", "Le fabricant a payé une contribution pour la gestion de ses déchets (V)", "Le produit est biodégradable"]
+    },
+    {
+      "question": "Le sigle \"PEHD\" que l'on trouve sur les bouteilles de lait correspond à :",
+      "options": ["Polyéthylène Haute Densité (V)", "Polyéthylène Basse Densité", "Polystyrène Expansé", "Polyester"]
+    },
+    {
+      "question": "Que devient le plastique trié et recyclé ?",
+      "options": ["Il est toujours enterré", "Il est brûlé sans récupération d'énergie", "Il est transformé en nouvelles matières premières (paillettes, granulés) (V)", "Il est envoyé dans l'espace"]
+    },
+    {
+      "question": "Quel est le premier geste de l'éco-consumérisme pour réduire les déchets d'emballage ?",
+      "options": ["Acheter des produits très emballés", "Refuser les emballages inutiles (comme les sacs plastique) (V)", "Jeter tous ses emballages par terre", "Acheter des bouteilles en plastique à usage unique"]
+    },
+    {
+      "question": "La \"consigne\" pour les bouteilles en plastique consiste à :",
+      "options": ["Les jeter n'importe où", "Payer une somme d'argent qui est rendue lorsque la bouteille est rapportée dans un point de collecte (V)", "Les réutiliser sans les laver", "Les brûler"]
+    },
+    {
+      "question": "Quel pourcentage de déchets plastiques est actuellement recyclé dans le monde ?",
+      "options": ["Moins de 10% (V)", "50%", "75%", "100%"]
+    },
+    {
+      "question": "La \"valorisation énergétique\" des déchets plastiques consiste à :",
+      "options": ["Les recycler en nouveaux objets", "Les composter", "Les incinérer pour produire de l'électricité ou de la chaleur (V)", "Les enterrer"]
+    },
+    {
+      "question": "Quel est le principe de base de l'économie circulaire pour le plastique ?",
+      "options": ["Produire, utiliser, jeter", "Extraire, fabriquer, consommer, jeter", "Réduire, réutiliser, recycler (V)", "Acheter le plus possible"]
+    },
+    {
+      "question": "Le \"biodégradable\" signifie qu'un matériau :",
+      "options": ["Se fragmente en microplastiques", "Peut être recyclé à l'infini", "Se décompose par des organismes vivants (bactéries, champignons) dans des conditions spécifiques (V)", "Est toujours fabriqué à base de pétrole"]
+    }
+  ],
+  "demi": [
+    {
+      "question": "Quel objet du quotidien peut facilement être remplacé par une version réutilisable pour réduire les déchets plastiques ?",
+      "options": ["La bouteille d'eau en plastique (V)", "Le téléphone portable", "La télévision", "Le frigo"]
+    },
+    {
+      "question": "Le \"vrac\" consiste à :",
+      "options": ["Acheter des produits sans emballage, en utilisant ses propres contenants (V)", "Acheter des produits très emballés", "Jeter ses déchets en vrac", "Acheter uniquement en ligne"]
+    },
+    {
+      "question": "Qu'est-ce que le \"upcycling\" ou \"surcyclage\" ?",
+      "options": ["Jeter un objet", "Recycler un déchet en un objet de qualité ou de valeur supérieure (V)", "Brûler des déchets", "Acheter du neuf"]
+    },
+    {
+      "question": "Une alternative écologique aux pailles en plastique est :",
+      "options": ["Les pailles en inox", "Les pailles en bambou", "Les pailles comestibles", "Toutes les réponses précédentes (V)"]
+    },
+    {
+      "question": "En 2021, l'Union européenne a interdit un objet en plastique à usage unique très polluant. Lequel ?",
+      "options": ["Les bouteilles d'eau", "Les cotons-tiges (V)", "Les voitures", "Les vêtements"]
+    },
+    {
+      "question": "La \"consigne pour réemploi\" signifie que :",
+      "options": ["L'emballage est jeté après usage", "L'emballage est lavé et réutilisé pour le même usage (comme les bouteilles en verre) (V)", "L'emballage est transformé en chaise", "L'emballage est brûlé"]
+    },
+    {
+      "question": "Participer à une \"opération nettoyage de plage ou de forêt\" est :",
+      "options": ["Inutile", "Une action citoyenne qui permet de sensibiliser et de ramasser les déchets sauvages (V)", "Réservée aux adultes", "Interdite par la loi"]
+    },
+    {
+      "question": "Combien de tonnes de plastique sont produites chaque année dans le monde ?",
+      "options": ["1 million", "10 millions", "Plus de 400 millions (V)", "1 milliard"]
+    },
+    {
+      "question": "Quelle est la part du plastique dans la production mondiale qui est destinée aux emballages ?",
+      "options": ["Environ 10%", "Environ 36% (V)", "Environ 75%", "100%"]
+    },
+    {
+      "question": "Le \"Great Pacific Garbage Patch\" est :",
+      "options": ["La plus grande décharge à ciel ouvert du monde", "La plus grande zone d'accumulation de déchets plastiques dans l'océan Pacifique (V)", "Un parc d'attractions", "Une usine de recyclage"]
+    },
+    {
+      "question": "Quel pays est le premier producteur de déchets plastiques au monde ?",
+      "options": ["La France", "Les États-Unis (V)", "La Chine", "L'Inde"]
+    },
+    {
+      "question": "En moyenne, combien de particules de microplastiques un être humain ingère-t-il chaque semaine ? (selon des études)",
+      "options": ["1", "10", "Environ 2000 (l'équivalent d'une carte de crédit) (V)", "1 million"]
+    },
+    {
+      "question": "La durée de vie d'un sac plastique utilisé en moyenne 20 minutes est d'environ :",
+      "options": ["1 an", "10 ans", "400 ans (V)", "1 jour"]
+    },
+    {
+      "question": "Quel pourcentage de déchets plastiques a déjà été recyclé au moins une fois ?",
+      "options": ["9% (V)", "50%", "75%", "100%"]
+    },
+    {
+      "question": "La majorité du plastique produit depuis les années 50 se trouve aujourd'hui :",
+      "options": ["Recyclé", "Dans les océans", "Dans des produits encore en usage", "Dans des décharges ou dans l'environnement (V)"]
+    },
+    {
+      "question": "La \"feuille de route économie circulaire\" en France vise à atteindre :",
+      "options": ["100% de plastique recyclé d'ici 2025 (V)", "50% de réduction des déchets mis en décharge d'ici 2025", "100% de nouveaux plastiques issus du pétrole", "La fin du tri sélectif"]
+    },
+    {
+      "question": "Qu'est-ce que le \"projet Ocean Cleanup\" ?",
+      "options": ["Une entreprise qui fabrique du plastique", "Une association qui organise des nettoyages de plages", "Une technologie conçue pour collecter les plastiques dans les océans (V)", "Un nouveau type de bateau de pêche"]
+    },
+    {
+      "question": "Le polystyrène expansé (PSE), utilisé pour les caisses de poisson ou les emballages, est :",
+      "options": ["Très facile à recycler partout", "Difficile à recycler car très léger et volumineux (V)", "Biodégradable en mer", "Aucune de ces réponses"]
+    },
+    {
+      "question": "Les \"plastiques oxo-dégradables\" sont :",
+      "options": ["Une bonne solution écologique", "Des plastiques qui se fragmentent en microplastiques et sont interdits dans l'UE (V)", "Des plastiques biosourcés", "Des plastiques recyclés à 100%"]
+    },
+    {
+      "question": "Le processus de recyclage chimique du plastique consiste à :",
+      "options": ["Le fondre pour en faire un nouvel objet", "Le broyer", "Le décomposer en ses molécules de base pour refaire du plastique neuf (V)", "Le composter"]
+    },
+    {
+      "question": "Le PET recyclé est souvent appelé :",
+      "options": ["rPET (V)", "nouveauPET", "superPET", "bioPET"]
+    },
+    {
+      "question": "Que fabrique-t-on souvent avec le PET recyclé ?",
+      "options": ["Des nouvelles bouteilles", "Des fibres pour les pulls en polaire", "Des rembourrages pour les coussins", "Toutes ces réponses (V)"]
+    },
+    {
+      "question": "Un \"écobilan\" permet d'évaluer :",
+      "options": ["Le prix d'un produit", "L'impact environnemental d'un produit sur tout son cycle de vie (V)", "La popularité d'un produit", "La solidité d'un produit"]
+    },
+    {
+      "question": "Pourquoi ne peut-on pas recycler le plastique à l'infini ?",
+      "options": ["Il est trop cher", "La qualité du polymère se dégrade à chaque cycle (V)", "Il devient trop léger", "Il change de couleur"]
+    },
+    {
+      "question": "Les \"filtres de cigarette\" sont principalement composés de :",
+      "options": ["Coton", "Papier", "Acétate de cellulose (un plastique) (V)", "Verre"]
+    }
+  ],
+  "finale": [
+    {
+      "question": "Les \"lingettes\" nettoyantes sont un problème car :",
+      "options": ["Elles sont souvent en fibres plastiques et ne sont pas biodégradables", "Elles bouchent les canalisations", "Elles sont jetées dans les toilettes", "Toutes ces réponses (V)"]
+    },
+    {
+      "question": "Le \"glyphosate\" est un produit lié à la pollution plastique car c'est :",
+      "options": ["Un additif du plastique", "Un pesticide qui peut contaminer les sols (V)", "Un produit utilisé pour laver le plastique recyclé", "Aucun lien"]
+    },
+    {
+      "question": "Quelle est la profondeur la plus grande à laquelle on a trouvé un déchet plastique ?",
+      "options": ["100 mètres", "1 000 mètres", "Dans la fosse des Mariannes, à près de 11 000 mètres de profondeur (V)", "500 mètres"]
+    },
+    {
+      "question": "Quel pourcentage des déchets plastiques océaniques provient de seulement 10 fleuves ?",
+      "options": ["10%", "50%", "90% (V)", "1%"]
+    },
+    {
+      "question": "La France produit environ combien de kilos de déchets plastiques par habitant et par an ?",
+      "options": ["10 kg", "30 kg", "60 kg (V)", "100 kg"]
+    },
+    {
+      "question": "Quelle était la masse du \"plus gros iceberg de plastique\" trouvé dans l'océan ?",
+      "options": ["10 kg", "100 kg", "1 tonne", "Plus de 50 tonnes (un filet de pêche géant) (V)"]
+    },
+    {
+      "question": "Combien de sacs plastique à usage unique sont-ils consommés dans le monde chaque seconde ?",
+      "options": ["10", "160 (V)", "1000", "10 000"]
+    },
+    {
+      "question": "Le recyclage d'une tonne de bouteilles en PET permet d'économiser environ :",
+      "options": ["1 litre de pétrole", "100 litres de pétrole", "830 litres de pétrole (V)", "10 000 litres de pétrole"]
+    },
+    {
+      "question": "Quel pays a interdit le premier les sacs plastique à usage unique ?",
+      "options": ["La France", "Le Bangladesh (en 2002) (V)", "Les États-Unis", "La Chine"]
+    },
+    {
+      "question": "Environ combien de mégots de cigarette sont jetés chaque seconde dans le monde ?",
+      "options": ["10", "100", "1 000", "137 000 (V)"]
+    },
+    {
+      "question": "Quel est l'objectif de la \"Stratégie Européenne pour les Plastiques\" concernant le recyclage des emballages plastiques d'ici 2030 ?",
+      "options": ["50% (V)", "75%", "100%", "25%"]
+    },
+    {
+      "question": "Le logo \"Triman\" indique que :",
+      "options": ["Le produit est fabriqué par un homme", "Le produit est recyclable", "Le produit est biodégradable", "Le produit doit être trié ou apporté en point de collecte (V)"]
+    },
+    {
+      "question": "Le sigle \"PVC\" correspond à :",
+      "options": ["Un plastique utilisé pour les fenêtres et les tuyaux (V)", "Un type de verre", "Un métal", "Un produit alimentaire"]
+    },
+    {
+      "question": "Le chiffre à l'intérieur du ruban de Möbius indique :",
+      "options": ["Le pourcentage de matière recyclée", "Le type de plastique (V)", "Le nombre de fois où il a été recyclé", "Le prix du produit"]
+    },
+    {
+      "question": "Le logo \"OK Compost\" certifie que :",
+      "options": ["Le produit est recyclable", "Le produit est biodégradable dans un composteur industriel (V)", "Le produit est fait en bois", "Le produit peut être jeté dans la nature"]
+    },
+    {
+      "question": "Que signifie le sigle \"ABS\" ?",
+      "options": ["Un plastique très résistant utilisé pour les Lego ou les pare-chocs de voiture (V)", "Un label de qualité alimentaire", "Un type de papier", "Une organisation environnementale"]
+    },
+    {
+      "question": "Le logo \"APUR\" indique :",
+      "options": ["La quantité de plastique recyclé utilisé dans le produit (V)", "La marque du produit", "Le pays d'origine", "La date de péremption"]
+    },
+    {
+      "question": "Le sigle \"PP\" que l'on trouve sur les pots de yaourt correspond à :",
+      "options": ["Polypropylène (V)", "Polystyrène", "Polyéthylène", "Polyester"]
+    },
+    {
+      "question": "Le logo \"Tidy Man\" (un petit bonhomme qui jette un déchet à la poubelle) :",
+      "options": ["Impose un geste de tri", "Indique que le produit est recyclable", "Est une simple incitation à ne pas jeter le déchet dans la nature (V)", "Garantit que l'emballage est biodégradable"]
+    },
+    {
+      "question": "Quelle activité connecte les apprentis explorateurs à des personnes locales impliquées dans la lutte contre la pollution plastique ?",
+      "options": ["Cap sur le terrain", "Le Conseil des explorateurs", "L’enquête des solutions", "L’interview des acteurs du changement (V)"]
+    }
+  ],
+  "supplementaire": [
+    {
+      "question": "Le sigle \"PS\" correspond souvent à :",
+      "options": ["Polystyrène (comme les gobelets ou les boîtiers de CD) (V)", "Polyéthylène", "Papier Solide", "Produit Sains"]
+    },
+    {
+      "question": "Quel est le geste le plus efficace pour lutter contre la pollution plastique ?",
+      "options": ["Recycler", "Réduire sa consommation à la source (V)", "Incinérer", "Mettre en décharge"]
+    },
+    {
+      "question": "En tant que collégien, quelle action concrète peux-tu mener pour sensibiliser les autres ?",
+      "options": ["Organiser une exposition sur la pollution plastique", "Créer un club \"nettoyage de la cour\"", "Présenter un exposé sur le sujet", "Toutes ces réponses (V)"]
+    },
+    {
+      "question": "Qu'est-ce que le \"plogging\" ?",
+      "options": ["Une nouvelle danse", "Ramasser des déchets en faisant son jogging (V)", "Un type de pollution", "Un réseau social"]
+    },
+    {
+      "question": "Acheter des vêtements en fibres synthétiques (polyester, nylon) contribue à la pollution microplastique car :",
+      "options": ["Ils sont chers", "Ils libèrent des microfibres au lavage (V)", "Ils sont fabriqués en Chine", "Ils sont lourds"]
+    },
+    {
+      "question": "Un \"cendrier de poche\" permet de :",
+      "options": ["Mieux fumer", "Jeter ses mégots sans les disperser dans la nature (V)", "Allumer un feu", "Rien d'utile"]
+    },
+    {
+      "question": "Pourquoi est-il important de bien vider les emballages avant de les trier ?",
+      "options": ["Pour ne pas attirer les insectes et les rongeurs dans les centres de tri", "Pour éviter de souiller les autres matériaux et faciliter le recyclage", "Les deux réponses précédentes sont justes (V)", "Ce n'est pas important"]
+    },
+    {
+      "question": "Quel impact a la pollution plastique sur le tourisme ?",
+      "options": ["Aucun impact", "Les plages sales dissuadent les touristes  (V)", "Elle améliore l'expérience touristique", "Elle attire les touristes"]
+    },
+    {
+      "question": "La \"pêche fantôme\" est causée par :",
+      "options": ["Des pêcheurs qui travaillent la nuit", "Des filets de pêche perdus ou abandonnés (V)", "Une technique de pêche écologique", "Un poisson rare"]
+    },
+    {
+      "question": "Que signifie l'expression \"Le meilleur déchet est celui qui n'existe pas\" ?",
+      "options": ["Il faut bien jeter ses déchets", "Il faut éviter de produire des déchets en amont (V)", "Il faut cacher ses déchets", "Il faut les brûler"]
+    }
+  ]
+}

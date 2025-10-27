@@ -3,6 +3,8 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
 
 const app = express();
 const server = createServer(app);
@@ -40,14 +42,84 @@ const questions = [
   { id: 20, question: "Le mouvement de la Négritude a été cofondé par :", options: ["Cheikh Anta Diop", "Léopold Sédar Senghor", "Alioune Diop", "Abdoulaye Sadji"], correct: 1 }
 ];
 
+// Charger les questions depuis data/questions.json si disponible
+const QUESTIONS_FILE = path.join(process.cwd(), 'data', 'questions.json');
+let questionsData = null;
+try {
+  if (fs.existsSync(QUESTIONS_FILE)) {
+    const raw = fs.readFileSync(QUESTIONS_FILE, 'utf-8');
+    questionsData = JSON.parse(raw);
+    console.log(`Questions chargées depuis ${QUESTIONS_FILE}`);
+  } else {
+    console.log('Aucun fichier data/questions.json, utilisation des questions par défaut.');
+  }
+} catch (e) {
+  console.warn('Erreur de chargement de data/questions.json, utilisation des questions par défaut.', e?.message);
+}
+
+// --- Nouveau: normalisation du format avec «(V)» et quotas par manche ---
+const STAGE_QUESTION_COUNTS = {
+  premiere: 30,
+  huitiemes: 20,
+  demi: 25,
+  finale: 20,
+  supplementaire: 10,
+};
+
+function stripVMarker(option) {
+  try {
+    return String(option).replace(/\s*\(V\)\s*/i, '').trim();
+  } catch {
+    return option;
+  }
+}
+
+function detectCorrectIndex(options) {
+  let idx = -1;
+  options.forEach((opt, i) => {
+    if (idx === -1 && /\(V\)/i.test(String(opt))) idx = i;
+  });
+  return idx;
+}
+
+function normalizeQuestion(q, index, stageKey) {
+  const options = Array.isArray(q.options) ? q.options.slice() : [];
+  let correct = typeof q.correct === 'number' ? q.correct : detectCorrectIndex(options);
+  const cleanedOptions = options.map(stripVMarker);
+  if (correct === -1 && cleanedOptions.length > 0) {
+    console.warn(`Question sans réponse marquée (V) détectée pour ${stageKey} #${index + 1}. Fallback sur la première option.`);
+    correct = 0;
+  }
+  const id = q.id ?? `${stageKey}-${index + 1}`;
+  return { id, question: q.question, options: cleanedOptions, correct };
+}
+
+function normalizeStage(arr, stageKey, maxCount) {
+  if (!Array.isArray(arr)) return [];
+  const normalized = arr.map((q, i) => normalizeQuestion(q, i, stageKey));
+  return normalized.slice(0, maxCount);
+}
+
 // Construire des sets de questions par manche (disjoints)
 function buildStageSets() {
+  // Si un fichier JSON est fourni, l’utiliser directement avec normalisation et quotas
+  if (questionsData) {
+    return {
+      premiere: normalizeStage(questionsData.premiere, 'premiere', STAGE_QUESTION_COUNTS.premiere),
+      huitiemes: normalizeStage(questionsData.huitiemes, 'huitiemes', STAGE_QUESTION_COUNTS.huitiemes),
+      demi: normalizeStage(questionsData.demi, 'demi', STAGE_QUESTION_COUNTS.demi),
+      finale: normalizeStage(questionsData.finale, 'finale', STAGE_QUESTION_COUNTS.finale),
+      supplementaire: normalizeStage(questionsData.supplementaire || questionsData.tieBreak, 'supplementaire', STAGE_QUESTION_COUNTS.supplementaire),
+    };
+  }
+  // Sinon, fallback: mélanger et découper le tableau par défaut (petits jeux de démo)
   const shuffled = [...questions].sort(() => Math.random() - 0.5);
   return {
     premiere: shuffled.slice(0, 5),
     huitiemes: shuffled.slice(5, 10),
     demi: shuffled.slice(10, 15),
-    finale: shuffled.slice(15, 20)
+    finale: shuffled.slice(15, 20),
+    supplementaire: shuffled.slice(0, Math.min(5, shuffled.length)),
   };
 }
 
@@ -196,7 +268,6 @@ const STAGE_QUALIFIERS = {
     room.gameState = 'waiting';
     room.buzzer = { active: false, playerId: null, timestamp: null };
     room.currentQuestionValue = 10;
-    room.askedQuestionIds = new Set();
 
     // Réinitialiser les statuts/scores des joueurs non éliminés
     room.players.forEach(p => {
@@ -392,6 +463,8 @@ const STAGE_QUALIFIERS = {
 
     // Arrêter le compte à rebours du buzzer
     clearInterval(room.timers.buzzer);
+    // Forcer l’affichage du buzzer à 0 côté clients
+    io.to(roomCode).emit('timer-update', { type: 'buzzer', countdown: 0 });
 
     // Vérifier si le buzzer est encore disponible
     if (!room.buzzer.active || room.buzzer.playerId) return;
@@ -772,11 +845,11 @@ const STAGE_QUALIFIERS = {
       room.tieBreak.maxQuestions = maxQuestions;
     }
 
-    // Choisir une question unique (non posée auparavant)
-    const allPools = Object.values(room.stageSets || {}).flat();
-    const available = allPools.filter(q => !room.askedQuestionIds.has(q.id));
+    // Choisir une question unique (non posée auparavant) depuis la manche 'supplementaire'
+    const tiePool = (room.stageSets && room.stageSets.supplementaire) ? room.stageSets.supplementaire : [];
+    const available = tiePool.filter(q => !room.askedQuestionIds.has(q.id));
     if (available.length === 0) {
-      socket.emit('error', { message: 'Plus de questions disponibles pour le tie-break.' });
+      socket.emit('error', { message: 'Plus de questions disponibles pour le tie-break dans la manche "supplémentaire".' });
       return;
     }
     const selected = available[Math.floor(Math.random() * available.length)];

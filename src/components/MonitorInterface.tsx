@@ -7,7 +7,7 @@ interface MonitorInterfaceProps {
 }
 
 export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState }) => {
-  const { room, gameStatus, currentQuestion, showQuestion } = gameState;
+  const { room, gameStatus, currentQuestion, showQuestion, timers } = gameState;
 
   if (!room) {
     return (
@@ -158,6 +158,19 @@ export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState })
                 <p className="text-gray-600">Statut: {stateLabel}</p>
                 {room.stage && <p className="text-sm text-gray-500">Manche: <span className="font-semibold">{formatStageLabel(room.stage)}</span></p>}
               </div>
+            </div>
+            <div className="text-center flex-1 mx-8">
+              {showQuestion && (
+                <h3 className="text-3xl font-bold text-red-600">
+                  {timers.buzzer > 0 ? (
+                    <>Temps pour buzzer: {timers.buzzer}s</>
+                  ) : timers.answer > 0 ? (
+                    <>Temps pour répondre: {timers.answer}s</>
+                  ) : (
+                    <>Temps écoulé</>
+                  )}
+                </h3>
+              )}
             </div>
             <div className="text-center">
               <div className="text-4xl font-mono font-bold text-purple-600 bg-purple-50 px-6 py-2 rounded-xl">{room.code}</div>

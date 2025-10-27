@@ -156,6 +156,27 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
     const totalQuestions = room.questions.length;
     const progress = (currentQuestionNumber / totalQuestions) * 100;
 
+    // Indicateur: questions restantes par manche
+    const stageSets: any = (room as any).stageSets || {};
+    const stagesOrder: Array<{ key: any; label: string }> = [
+      { key: 'premiere', label: 'Première' },
+      { key: 'huitiemes', label: 'Huitièmes' },
+      { key: 'demi', label: 'Demi-finale' },
+      { key: 'finale', label: 'Finale' },
+      { key: 'supplementaire', label: 'Supplémentaire' },
+    ];
+    const remainingByStage = stagesOrder.map(({ key, label }) => {
+      const total = Array.isArray(stageSets[key]) ? stageSets[key].length : 0;
+      let asked = 0;
+      if (room.stage === key) {
+        asked = Math.min(currentQuestionNumber, total);
+      } else if (key === 'supplementaire' && room.tieBreak && typeof room.tieBreak.askedCount === 'number') {
+        asked = Math.min(room.tieBreak.askedCount, total);
+      }
+      const remaining = Math.max(0, total - asked);
+      return { key, label, total, asked, remaining };
+    });
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 p-4">
         <audio ref={correctAudioRef} src="/sounds/correct.mp3" preload="auto" />
@@ -181,9 +202,21 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                 </div>
               </div>
             </div>
-            
+
+            {/* Indicateur questions restantes par manche */}
+            <div className="mt-2">
+              <p className="text-sm text-gray-600 mb-2">Questions restantes par manche</p>
+              <div className="flex flex-wrap gap-2">
+                {remainingByStage.map(({ key, label, remaining, total }) => (
+                  <span key={key} className={`px-3 py-1 rounded-full text-sm font-semibold border ${room.stage === key ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                    {label}: {remaining}/{total}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             {/* Barre de progression */}
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 rounded-full h-3 mt-4">
               <div 
                 className="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
