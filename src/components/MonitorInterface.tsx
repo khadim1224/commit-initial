@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Crown, Users, AlertCircle, Eye, CheckCircle2, XCircle, Trophy } from 'lucide-react';
 import { GameState, Player } from '../types/game';
 
@@ -8,6 +8,74 @@ interface MonitorInterfaceProps {
 
 export const MonitorInterface: React.FC<MonitorInterfaceProps> = ({ gameState }) => {
   const { room, gameStatus, currentQuestion, showQuestion, timers } = gameState;
+
+  // Audio: bip de compte à rebours pour le moniteur
+  const lastBuzzerRef = useRef<number | null>(null);
+  const lastAnswerRef = useRef<number | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const playBeep = (freq = 880, durationMs = 120) => {
+    try {
+      // Initialiser AudioContext au besoin
+      if (!audioCtxRef.current) {
+        const Ctx: any = (window as any).AudioContext || (window as any).webkitAudioContext;
+        audioCtxRef.current = new Ctx();
+      }
+      const ctx = audioCtxRef.current!;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+      // Oscillateur court et discret
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.value = 0.12; // volume légèrement augmenté pour le moniteur
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      setTimeout(() => {
+        try {
+          osc.stop();
+          osc.disconnect();
+          gain.disconnect();
+        } catch {}
+      }, durationMs);
+    } catch {}
+  };
+
+  // Jouer un bip à chaque décrémentation du timer buzzer / réponse
+  useEffect(() => {
+    if (!room) return;
+
+    if (room.gameState === 'buzzer_active') {
+      if (typeof timers.buzzer === 'number') {
+        const prev = lastBuzzerRef.current;
+        if (prev === null || timers.buzzer < prev) {
+          if (timers.buzzer > 0) playBeep();
+          lastBuzzerRef.current = timers.buzzer;
+        } else if (prev === null || timers.buzzer > prev) {
+          // réinitialisation en cas de nouveau cycle
+          lastBuzzerRef.current = timers.buzzer;
+        }
+      }
+    } else {
+      lastBuzzerRef.current = null;
+    }
+
+    if (room.gameState === 'answering') {
+      if (typeof timers.answer === 'number') {
+        const prevA = lastAnswerRef.current;
+        if (prevA === null || timers.answer < prevA) {
+          if (timers.answer > 0) playBeep(720);
+          lastAnswerRef.current = timers.answer;
+        } else if (prevA === null || timers.answer > prevA) {
+          lastAnswerRef.current = timers.answer;
+        }
+      }
+    } else {
+      lastAnswerRef.current = null;
+    }
+  }, [room?.gameState, timers.buzzer, timers.answer]);
 
   if (!room) {
     return (

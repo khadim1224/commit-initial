@@ -231,10 +231,14 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                 )}
 
                 {room.gameState === 'buzzer_active' && currentPlayer?.status === 'incorrect' && (
-                  <div className="py-12">
-                    <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                    <p className="text-red-600 text-lg font-semibold">Réponse incorrecte.</p>
-                    <p className="text-gray-600">Vous ne pouvez plus buzzer sur cette question.</p>
+                  <div className="mb-6">
+                    <div className="bg-red-50 border border-red-300 rounded-xl p-4">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-6 h-6 text-red-600" />
+                        <span className="font-semibold text-red-700">Réponse incorrecte — vous ne pouvez plus buzzer sur cette question.</span>
+                      </div>
+                      <p className="text-red-600 text-sm mt-2">Veuillez attendre la prochaine question.</p>
+                    </div>
                   </div>
                 )}
 
@@ -290,6 +294,12 @@ export const PlayerInterface: React.FC<PlayerInterfaceProps> = ({
                         <Trophy className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-600 text-lg">En attente de la question suivante...</p>
                       </>
+                    )}
+                    {/* Afficher la bonne réponse pour tous les joueurs en phase de résultats */}
+                    {currentQuestion && (
+                      <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-700">Bonne réponse: <span className="font-semibold text-green-700">{currentQuestion.options[currentQuestion.correct]}</span></p>
+                      </div>
                     )}
                   </div>
                 )}

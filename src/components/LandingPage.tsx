@@ -24,7 +24,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
           className="text-2xl text-gray-300 mb-8"
         >
-          Testez vos connaissances sur l'histoire du Sénégal et défiez vos amis.
+          APPRENTIS EXPLORATEURS / PLASTIC ODYSSEY
         </motion.p>
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}

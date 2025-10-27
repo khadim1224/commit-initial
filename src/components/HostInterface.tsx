@@ -155,6 +155,7 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
     const currentQuestionNumber = room.currentQuestion + 1;
     const totalQuestions = room.questions.length;
     const progress = (currentQuestionNumber / totalQuestions) * 100;
+    const currentQ = (gameState.currentQuestion ?? null) as any;
 
     // Indicateur: questions restantes par manche
     const stageSets: any = (room as any).stageSets || {};
@@ -362,6 +363,14 @@ export const HostInterface: React.FC<HostInterfaceProps> = ({
                     <SkipForward className="w-5 h-5" />
                     <span>Question Suivante</span>
                   </button>
+                )}
+
+                {/* Affichage de la bonne réponse côté hôte en phase résultats */}
+                {room.gameState === 'results' && currentQ && (
+                  <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                    <p className="font-semibold text-green-700">Bonne réponse</p>
+                    <p className="text-sm text-green-800">{currentQ.options[currentQ.correct]}</p>
+                  </div>
                 )}
 
                 {room.gameState === 'buzzer_active' && (
